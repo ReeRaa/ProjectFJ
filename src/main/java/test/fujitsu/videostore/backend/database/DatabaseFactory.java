@@ -67,17 +67,6 @@ public class DatabaseFactory {
                         movieList.add(movie);
                     }
 
-/*                        for (int i = 1; i <= 10; i++) {
-                        Movie movie = new Movie();
-
-                        movie.setId(i);
-                        movie.setName("Movie " + i);
-                        movie.setStockCount(i);
-
-                        movieList.add(movie);
-                    }*/
-
-
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
                 }catch (ParseException e){
@@ -209,6 +198,7 @@ public class DatabaseFactory {
 
             @Override
             public DBTableRepository<RentOrder> getOrderTable() {
+
                 final List<RentOrder> orderList = new ArrayList<>();
 
                 JSONParser parser = new JSONParser();
@@ -260,6 +250,8 @@ public class DatabaseFactory {
 
                             orderItems.add(item);
                         }
+                        order.setItems(orderItems);
+                        orderList.add(order);
 
 
 
@@ -281,8 +273,7 @@ public class DatabaseFactory {
                                 orderItems.add(item);
                             }
 
-                            order.setItems(orderItems);
-                            orderList.add(order);
+
                         }*/
 
                     }
