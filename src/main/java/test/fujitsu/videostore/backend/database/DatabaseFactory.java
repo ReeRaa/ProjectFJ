@@ -8,6 +8,7 @@ import test.fujitsu.videostore.backend.domain.RentOrder;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -63,18 +64,6 @@ public class DatabaseFactory {
                         Number MovieStockCount = (Number) movieData.get("stockCount");
                         movie.setStockCount(MovieStockCount.intValue());
 
-/*                        Integer aMovieType = (Integer) movieData.get("type");
-                        switch (aMovieType) {
-                            case 1:
-                                MovieType mt1 = MovieType.NEW;
-                                movie.setType(mt1);
-                            case 2:
-                                MovieType mt2 = MovieType.REGULAR;
-                                movie.setType(mt2);
-                            case 3:
-                                MovieType mt3 = MovieType.OLD;
-                                movie.setType(mt3);
-                        }*/
                         movieList.add(movie);
                     }
 
@@ -175,15 +164,6 @@ public class DatabaseFactory {
                     e.printStackTrace();
                 }
 
-/*                for (int i = 1; i <= 1; i++) {
-                    Customer customer = new Customer();
-                    customer.setId(i);
-                    customer.setName("Customer " + i);
-                    customer.setPoints(i * 10);
-
-                    customerList.add(customer);
-                }*/
-
                 return new DBTableRepository<Customer>() {
                     @Override
                     public List<Customer> getAll() {
@@ -231,26 +211,89 @@ public class DatabaseFactory {
             public DBTableRepository<RentOrder> getOrderTable() {
                 final List<RentOrder> orderList = new ArrayList<>();
 
-                for (int i = 1; i <= 1; i++) {
-                    RentOrder order = new RentOrder();
-                    order.setId(i);
-                    order.setCustomer(getCustomerTable().findById(i));
+                JSONParser parser = new JSONParser();
+                try {
+                    Object obj = parser.parse(new FileReader(filePath));
+                    JSONObject jsonObject = (JSONObject) obj;
 
-                    List<RentOrder.Item> orderItems = new ArrayList<>();
+                    JSONArray orderArray = (JSONArray) jsonObject.get("order");
 
-                    for (int a = 1; a <= 10; a++) {
-                        RentOrder.Item item = new RentOrder.Item();
-                        item.setMovie(getMovieTable().findById(a));
-                        item.setMovieType(MovieType.REGULAR);
-                        item.setPaidByBonus(a % 2 == 0);
-                        item.setDays(11 - a);
+                    for (int i = 0; i < orderArray.size(); i++) {
+                        RentOrder order = new RentOrder();
 
-                        orderItems.add(item);
+                        JSONObject orderData = (JSONObject) orderArray.get(i);
+                        Number id = (Number) orderData.get("id");
+                        order.setId(id.intValue());
+                        order.setCustomer(getCustomerTable().findById(id.intValue()));
+
+                        JSONArray itemsArray = (JSONArray) orderData.get("items");
+                        List<RentOrder.Item> orderItems = new ArrayList<>();
+
+                        for (int j=0;j<itemsArray.size();j++){
+
+                            JSONObject itemData = (JSONObject) itemsArray.get(j);
+                            RentOrder.Item item = new RentOrder.Item();
+
+                            Number movie = (Number) itemData.get("movie");
+                            item.setMovie(getMovieTable().findById(movie.intValue()));
+
+                            Number aMovieType = (Number) itemData.get("type");
+                            switch (aMovieType.intValue()) {
+                                case 1:
+                                    MovieType mt1 = MovieType.NEW;
+                                    item.setMovieType(mt1);
+                                case 2:
+                                    MovieType mt2 = MovieType.REGULAR;
+                                    item.setMovieType(mt2);
+                                case 3:
+                                    MovieType mt3 = MovieType.OLD;
+                                    item.setMovieType(mt3);
+                            }
+
+                            Number days = (Number) itemData.get("days");
+                            item.setDays(days.intValue());
+                            Boolean paidByBonus= (Boolean) itemData.get("paidByBonus");
+                            item.setPaidByBonus(paidByBonus);
+                            LocalDate returnedDay = (LocalDate) itemData.get("returnedDay");
+                            item.setReturnedDay(returnedDay);
+                            Number type = (Number) itemData.get("type");
+
+                            orderItems.add(item);
+                        }
+
+
+
+/*                        for (int i = 1; i <= 10; i++) {
+                            RentOrder order = new RentOrder();
+                            order.setId(i);
+                            order.setCustomer(getCustomerTable().findById(i));
+
+                            List<RentOrder.Item> orderItems = new ArrayList<>();
+
+                            for (int a = 1; a <= 10; a++) {
+                                RentOrder.Item item = new RentOrder.Item();
+
+                                item.setMovie(getMovieTable().findById(a));
+                                item.setMovieType(MovieType.REGULAR);
+                                item.setPaidByBonus(a % 2 == 0);
+                                item.setDays(11 - a);
+
+                                orderItems.add(item);
+                            }
+
+                            order.setItems(orderItems);
+                            orderList.add(order);
+                        }*/
+
                     }
-
-                    order.setItems(orderItems);
-                    orderList.add(order);
+                } catch (FileNotFoundException e) {
+                    e.printStackTrace();
+                }catch (ParseException e){
+                    e.printStackTrace();
+                }catch (IOException e){
+                    e.printStackTrace();
                 }
+
 
                 return new DBTableRepository<RentOrder>() {
                     @Override
