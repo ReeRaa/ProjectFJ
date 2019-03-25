@@ -87,8 +87,36 @@ public class DatabaseFactory {
                         return movieList.stream().filter(movie -> movie.getId() == id).findFirst().get();
                     }
 
+
+                    //Delete movie
+
                     @Override
                     public boolean remove(Movie object) {
+
+                        try {
+                            Object obj = parser.parse(new FileReader(filePath));
+                            JSONObject jsonObject = (JSONObject) obj;
+                            JSONArray moviesArray = (JSONArray) jsonObject.get("movie");
+
+                            for (int i=0;i<movieList.size();i++){
+                                if (movieList.get(i).equals(object));
+                                movieList.remove(i);
+                                for (int j = 0; j < moviesArray.size(); j++) {
+                                    if (moviesArray.get(j).equals(object)) {
+                                        moviesArray.remove(j);
+                                        j--;
+                                    }
+                                }
+                                i--;
+                            }
+
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }catch (ParseException e){
+                            e.printStackTrace();
+                        }catch (IOException e){
+                            e.printStackTrace();
+                        }
                         return movieList.remove(object);
                     }
 
@@ -115,7 +143,7 @@ public class DatabaseFactory {
 
                     @Override
                     public int generateNextId() {
-                        return movieList.size() + 1;
+                        return movieList.size() + 1; //add static variable
                     }
                 };
             }
@@ -252,29 +280,6 @@ public class DatabaseFactory {
                         }
                         order.setItems(orderItems);
                         orderList.add(order);
-
-
-
-/*                        for (int i = 1; i <= 10; i++) {
-                            RentOrder order = new RentOrder();
-                            order.setId(i);
-                            order.setCustomer(getCustomerTable().findById(i));
-
-                            List<RentOrder.Item> orderItems = new ArrayList<>();
-
-                            for (int a = 1; a <= 10; a++) {
-                                RentOrder.Item item = new RentOrder.Item();
-
-                                item.setMovie(getMovieTable().findById(a));
-                                item.setMovieType(MovieType.REGULAR);
-                                item.setPaidByBonus(a % 2 == 0);
-                                item.setDays(11 - a);
-
-                                orderItems.add(item);
-                            }
-
-
-                        }*/
 
                     }
                 } catch (FileNotFoundException e) {
