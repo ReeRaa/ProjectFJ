@@ -11,7 +11,9 @@ import java.io.IOException;
 import java.io.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
@@ -114,13 +116,27 @@ public class DatabaseFactory {
 
                                 Number MovieStockCount = (Number) movieData.get("stockCount");
                                 movie.setStockCount(MovieStockCount.intValue());
-                                if (MovieName.equalsIgnoreCase(object.getName().toString())) {
-                                    newMovieList.add(movie);
+                            }
+
+                            JSONObject jo=new JSONObject();
+                            Map mainMap;
+                            JSONArray movieArray=new JSONArray();
+
+                            for (int j=0;j<movieList.size();j++){
+                                mainMap=new LinkedHashMap(4);
+                                mainMap.put("id",movieList.get(j).getId());
+                                mainMap.put("name",movieList.get(j).getName());
+                                mainMap.put("stockCount",movieList.get(j).getStockCount());
+                                mainMap.put("type",movieList.get(j).getType().getDatabaseId());
+                                if (!movieList.get(j).getName().equalsIgnoreCase(object.getName())) {
+                                    movieArray.add(mainMap);
+                                    jo.put("movie",movieArray);
                                 }
+
                             }
 
                             PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\Result.json");
-                            pwr.write(newMovieList.toString());
+                            pwr.write(jo.toJSONString());
                             pwr.flush();
                             pwr.close();
 
