@@ -8,6 +8,7 @@ import test.fujitsu.videostore.backend.domain.RentOrder;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -96,19 +97,33 @@ public class DatabaseFactory {
                         try {
                             Object obj = parser.parse(new FileReader(filePath));
                             JSONObject jsonObject = (JSONObject) obj;
-                            JSONArray moviesArray = (JSONArray) jsonObject.get("movie");
+                            JSONArray newMoviesArray = (JSONArray) jsonObject.get("movie");
 
-                            for (int i=0;i<movieList.size();i++){
-                                if (movieList.get(i).equals(object));
-                                movieList.remove(i);
-                                for (int j = 0; j < moviesArray.size(); j++) {
-                                    if (moviesArray.get(j).equals(object)) {
-                                        moviesArray.remove(j);
-                                        j--;
-                                    }
+                            final List<Movie> newMovieList = new ArrayList<>();
+
+                            for (int i = 0; i < newMoviesArray.size(); i++) {
+                                Movie movie = new Movie();
+
+                                JSONObject movieData = (JSONObject) newMoviesArray.get(i);
+
+                                Number MovieId = (Number) movieData.get("id");
+                                movie.setId(MovieId.intValue());
+
+                                String MovieName = (String) movieData.get("name");
+                                movie.setName(MovieName);
+
+                                Number MovieStockCount = (Number) movieData.get("stockCount");
+                                movie.setStockCount(MovieStockCount.intValue());
+                                if (MovieName.equalsIgnoreCase(object.getName().toString())) {
+                                    newMovieList.add(movie);
                                 }
-                                i--;
                             }
+
+                            PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\Result.json");
+                            pwr.write(newMovieList.toString());
+                            pwr.flush();
+                            pwr.close();
+
 
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
