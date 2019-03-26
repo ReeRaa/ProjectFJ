@@ -97,7 +97,7 @@ public class DatabaseFactory {
                     public boolean remove(Movie object) {
 
                         try {
-                            Object obj = parser.parse(new FileReader(filePath));
+/*                            Object obj = parser.parse(new FileReader(filePath));
                             JSONObject jsonObject = (JSONObject) obj;
                             JSONArray newMoviesArray = (JSONArray) jsonObject.get("movie");
 
@@ -116,7 +116,7 @@ public class DatabaseFactory {
 
                                 Number MovieStockCount = (Number) movieData.get("stockCount");
                                 movie.setStockCount(MovieStockCount.intValue());
-                            }
+                            }*/
 
                             JSONObject jo=new JSONObject();
                             Map mainMap;
@@ -130,10 +130,12 @@ public class DatabaseFactory {
                                 mainMap.put("type",movieList.get(j).getType().getDatabaseId());
                                 if (!movieList.get(j).getName().equalsIgnoreCase(object.getName())) {
                                     movieArray.add(mainMap);
-                                    jo.put("movie",movieArray);
+                                    jo.put("customer",movieArray);
                                 }
 
                             }
+
+                            // TODO: add customer + orders to WRITER
 
                             PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\Result.json");
                             pwr.write(jo.toJSONString());
@@ -143,8 +145,8 @@ public class DatabaseFactory {
 
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
-                        }catch (ParseException e){
-                            e.printStackTrace();
+/*                        }catch (ParseException e){
+                            e.printStackTrace();*/
                         }catch (IOException e){
                             e.printStackTrace();
                         }
@@ -189,6 +191,7 @@ public class DatabaseFactory {
                     JSONObject jsonObject = (JSONObject) obj;
                     JSONArray customerArray = (JSONArray) jsonObject.get("customer");
 
+
                     for (int i = 0; i < customerArray.size(); i++) {
                         Customer customer = new Customer();
 
@@ -223,8 +226,41 @@ public class DatabaseFactory {
                         return getAll().stream().filter(customer -> customer.getId() == id).findFirst().get();
                     }
 
+                    //remove customer
                     @Override
                     public boolean remove(Customer object) {
+                        try {
+                            JSONObject jo=new JSONObject();
+                            Map mainMapC;
+                            JSONArray customerArray=new JSONArray();
+
+                            for (int i=0;i<customerList.size();i++){
+                                mainMapC=new LinkedHashMap(3);
+                                mainMapC.put("id",customerList.get(i).getId());
+                                mainMapC.put("name",customerList.get(i).getName());
+                                mainMapC.put("points",customerList.get(i).getPoints());
+                                if (!customerList.get(i).getName().equalsIgnoreCase(object.getName())) {
+                                    customerArray.add(mainMapC);
+                                    jo.put("movie",customerArray);
+                                }
+
+                            }
+
+                            // TODO: add movies + orders to WRITER
+
+                            PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\Result.json");
+                            pwr.write(jo.toJSONString());
+                            pwr.flush();
+                            pwr.close();
+
+
+                        } catch (FileNotFoundException e) {
+                            e.printStackTrace();
+                        }catch (IOException e){
+                            e.printStackTrace();
+                        }
+
+
                         return customerList.remove(object);
                     }
 
