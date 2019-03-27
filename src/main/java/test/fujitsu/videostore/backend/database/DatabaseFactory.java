@@ -395,57 +395,44 @@ public class DatabaseFactory {
                     public boolean remove(RentOrder object) {
 
                         try {
+                            JSONObject joInitial=new JSONObject();
                             JSONObject jo=new JSONObject();
-                            Map mainMapO;
-                            JSONArray orderArray=new JSONArray();
+                            JSONObject joItems=new JSONObject();
+                        //    Map mainMapO;
+
+                        //    JSONArray orderArray=new JSONArray();
 
                             for (int i=0;i<orderList.size();i++){
-                                mainMapO=new LinkedHashMap(3);
-                                mainMapO.put("id",orderList.get(i).getId());
-                                mainMapO.put("customer",orderList.get(i).getCustomer());
-                                mainMapO.put("orderDate",orderList.get(i).getOrderDate());
-
                                 if (orderList.get(i).getId()!=object.getId()) {
-                                    orderArray.add(mainMapO);
-                                    jo.put("order",orderArray);
 
-                                    JSONArray itemsArray=new JSONArray();
+                           //         mainMapO=new LinkedHashMap(3);
+                                jo.put("id",orderList.get(i).getId());
+                                jo.put("customer",orderList.get(i).getCustomer().getId());
+                                jo.put("orderDate",orderList.get(i).getOrderDate());
 
-                                for (int j=0;j<orderList.get(i).getItems().size();j++){
-                                    mainMapO=new LinkedHashMap(5);
-                                    mainMapO.put("movie",orderList.get(j).getItems().get(j).getMovie().getId());
-                                    mainMapO.put("type",orderList.get(j).getItems().get(j).getMovieType().getDatabaseId());
-                                    mainMapO.put("paidByBonus",orderList.get(j).getItems().get(j).isPaidByBonus());
-                                    mainMapO.put("days",orderList.get(j).getItems().get(j).getDays());
-                                    mainMapO.put("returnedDay",orderList.get(j).getItems().get(j).getReturnedDay());
-                                        itemsArray.add(mainMapO);
-                                        jo.put("items",itemsArray);
+                                  //  orderArray.add(mainMapO);
+                                    joInitial.put("order",jo);
+
+                                   // JSONArray itemsArray=new JSONArray();
+
+                                for (int j=0;orderList.get(j).getItems().isEmpty();j++){
+                            //        mainMapO=new LinkedHashMap(5);
+                                    joItems.put("movie",orderList.get(j).getItems().get(j).getMovie().getId());
+                                    joItems.put("type",orderList.get(j).getItems().get(j).getMovieType().getDatabaseId());
+                                    joItems.put("paidByBonus",orderList.get(j).getItems().get(j).isPaidByBonus());
+                                    joItems.put("days",orderList.get(j).getItems().get(j).getDays());
+                                    joItems.put("returnedDay",orderList.get(j).getItems().get(j).getReturnedDay());
+                                   //     itemsArray.add(mainMapO);
+                                        //joItems.put("items",itemsArray);
+                                        jo.put("items",joItems);
                                 }
+
 
                                 }
 
                             }
 
                             // TODO: add movies + customer to WRITER
-
-
-                            try {
-
-                                JSONObject jo=new JSONObject();
-                                Map mainMap;
-                                JSONArray movieArray=new JSONArray();
-
-                                for (int i=0;i<movieList.size();i++){
-                                    mainMap=new LinkedHashMap(4);
-                                    mainMap.put("id",movieList.get(i).getId());
-                                    mainMap.put("name",movieList.get(i).getName());
-                                    mainMap.put("stockCount",movieList.get(i).getStockCount());
-                                    mainMap.put("type",movieList.get(i).getType().getDatabaseId());
-                                    if (movieList.get(i).getId()!=object.getId()) {
-                                        movieArray.add(mainMap);
-                                        jo.put("movie",movieArray);
-                                    }
-                                }
 
 
                             PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\Result.json");
