@@ -115,7 +115,6 @@ public class DatabaseFactory {
 
                           //  getCustomerTable();
                             final List<Customer> customerList = new ArrayList<>();
-                            JSONParser parser = new JSONParser();
 
                                 Object obj = parser.parse(new FileReader(filePath));
                                 JSONObject jsonObject = (JSONObject) obj;
@@ -135,6 +134,24 @@ public class DatabaseFactory {
 
                                     customerList.add(customer);
                                 }
+
+                                //write back Customer table
+                          //  JSONObject jo=new JSONObject();
+                            Map mainMapC;
+                            JSONArray customerArrayW=new JSONArray();
+
+                            for (int i=0;i<customerList.size();i++){
+                                mainMapC=new LinkedHashMap(3);
+                                mainMapC.put("id",customerList.get(i).getId());
+                                mainMapC.put("name",customerList.get(i).getName());
+                                mainMapC.put("points",customerList.get(i).getPoints());
+                               // if (customerList.get(i).getId()!=object.getId()) {
+                                customerArray.add(mainMapC);
+                                jo.put("customer",customerArrayW);
+                                }
+
+
+
 
                             JSONArray customerArrayN=new JSONArray();
 
@@ -244,23 +261,70 @@ public class DatabaseFactory {
                     @Override
                     public boolean remove(Customer object) {
                         try {
+
+                            //read in movies from file
+                            final List<Movie> movieList = new ArrayList<>();
+
+                            JSONParser parser = new JSONParser();
+                                Object obj = parser.parse(new FileReader(filePath));
+                                JSONObject jsonObject = (JSONObject) obj;
+                                JSONArray moviesArray = (JSONArray) jsonObject.get("movie");
+
+                                for (int i = 0; i < moviesArray.size(); i++) {
+                                    Movie movie = new Movie();
+
+                                    JSONObject movieData = (JSONObject) moviesArray.get(i);
+
+                                    Number MovieId = (Number) movieData.get("id");
+                                    movie.setId(MovieId.intValue());
+
+                                    String MovieName = (String) movieData.get("name");
+                                    movie.setName(MovieName);
+
+                                    Number MovieStockCount = (Number) movieData.get("stockCount");
+                                    movie.setStockCount(MovieStockCount.intValue());
+
+                                    movieList.add(movie);
+                                }
+
+                                //write movies back to file
+
                             JSONObject jo=new JSONObject();
-                            Map mainMapC;
+                            Map mainMap;
+                            JSONArray movieArray=new JSONArray();
+
+                            for (int i=0;i<movieList.size();i++){
+                                mainMap=new LinkedHashMap(4);
+                                mainMap.put("id",movieList.get(i).getId());
+                                mainMap.put("name",movieList.get(i).getName());
+                                mainMap.put("stockCount",movieList.get(i).getStockCount());
+                                mainMap.put("type",movieList.get(i).getType().getDatabaseId());
+                                if (movieList.get(i).getId()!=object.getId()) {
+                                    movieArray.add(mainMap);
+                                    jo.put("movie",movieArray);
+                                }
+                            }
+                            //write customer back to file
+                            //  getCustomerTable();
+                            //final List<Customer> customerList = new ArrayList<>();
+
+                            //JSONObject jo=new JSONObject();
+                            //Map mainMapC;
                             JSONArray customerArray=new JSONArray();
 
                             for (int i=0;i<customerList.size();i++){
-                                mainMapC=new LinkedHashMap(3);
-                                mainMapC.put("id",customerList.get(i).getId());
-                                mainMapC.put("name",customerList.get(i).getName());
-                                mainMapC.put("points",customerList.get(i).getPoints());
+                                mainMap=new LinkedHashMap(3);
+                                mainMap.put("id",customerList.get(i).getId());
+                                mainMap.put("name",customerList.get(i).getName());
+                                mainMap.put("points",customerList.get(i).getPoints());
                                 if (customerList.get(i).getId()!=object.getId()) {
-                                        customerArray.add(mainMapC);
+                                        customerArray.add(mainMap);
                                     jo.put("customer",customerArray);
                                 }
 
                             }
 
-                            // TODO: add movies + orders to WRITER
+                            // TODO: add orders to WRITER
 
 
                             PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\Result.json");
@@ -272,6 +336,8 @@ public class DatabaseFactory {
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
                         }catch (IOException e){
+                            e.printStackTrace();
+                        }catch (ParseException e){
                             e.printStackTrace();
                         }
 
@@ -395,52 +461,61 @@ public class DatabaseFactory {
                     public boolean remove(RentOrder object) {
 
                         try {
-                            JSONObject joInitial=new JSONObject();
-                            JSONObject jo=new JSONObject();
+                            JSONObject joMain=new JSONObject();
+
                             JSONObject joItems=new JSONObject();
                         //    Map mainMapO;
 
                         //    JSONArray orderArray=new JSONArray();
 
-                            for (int i=0;i<orderList.size();i++){
-                                if (orderList.get(i).getId()!=object.getId()) {
+                            for (int i=0;i<orderList.size();i++) {
+                                if (orderList.get(i).getId() != object.getId()) {
 
-                           //         mainMapO=new LinkedHashMap(3);
-                                jo.put("id",orderList.get(i).getId());
-                                jo.put("customer",orderList.get(i).getCustomer().getId());
-                                jo.put("orderDate",orderList.get(i).getOrderDate());
+                                    //         mainMapO=new LinkedHashMap(3);
+                                    joMain.put("id", orderList.get(i).getId());
+                                    joMain.put("customer", orderList.get(i).getCustomer().getId());
+                                    joMain.put("orderDate", orderList.get(i).getOrderDate());
 
-                                  //  orderArray.add(mainMapO);
-                                    joInitial.put("order",jo);
+                                    //  orderArray.add(mainMapO);
+                                    joMain.put("order", joMain);
 
-                                   // JSONArray itemsArray=new JSONArray();
+                                    // JSONArray itemsArray=new JSONArray();
 
-                                for (int j=0;orderList.get(j).getItems().isEmpty();j++){
-                            //        mainMapO=new LinkedHashMap(5);
-                                    joItems.put("movie",orderList.get(j).getItems().get(j).getMovie().getId());
-                                    joItems.put("type",orderList.get(j).getItems().get(j).getMovieType().getDatabaseId());
-                                    joItems.put("paidByBonus",orderList.get(j).getItems().get(j).isPaidByBonus());
-                                    joItems.put("days",orderList.get(j).getItems().get(j).getDays());
-                                    joItems.put("returnedDay",orderList.get(j).getItems().get(j).getReturnedDay());
-                                   //     itemsArray.add(mainMapO);
+                                    for (int j = 0; j < orderList.get(i).getItems().size(); j++) {
+                                        //      Iterator it = orderList.get(i).getItems().iterator();
+                                        // while (it.hasNext()) {
+                                        joItems.put("movie", orderList.get(i).getItems().get(j).getMovie().getId());
+                                        joItems.put("type", orderList.get(i).getItems().get(j).getMovieType().getDatabaseId());
+                                        joItems.put("paidByBonus", orderList.get(j).getItems().get(j).isPaidByBonus());
+                                        joItems.put("days", orderList.get(j).getItems().get(j).getDays());
+                                        joItems.put("returnedDay", orderList.get(j).getItems().get(j).getReturnedDay());
+                                        //     itemsArray.add(mainMapO);
                                         //joItems.put("items",itemsArray);
-                                        jo.put("items",joItems);
-                                }
+                                        joMain.put("items", joItems);
+                                        // it.next();
+                                        //    }
+                                        //   j++;
+                                        //  }
+
+                                        //   orderList.get(i).getItems().iterator()
+                                        // for (int j=0;orderList.get(i).getItems().isEmpty();j++){
+                                        //        mainMapO=new LinkedHashMap(5);
 
 
+                                    }
+
                                 }
+
+                                // TODO: add movies + customer to WRITER
+
+
+                                PrintWriter pwr = new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\Result.json");
+                                pwr.write(joMain.toJSONString());
+
+                                pwr.flush();
+                                pwr.close();
 
                             }
-
-                            // TODO: add movies + customer to WRITER
-
-
-                            PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\Result.json");
-                            pwr.write(jo.toJSONString());
-                            pwr.flush();
-                            pwr.close();
-
-
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
                         }catch (IOException e){
