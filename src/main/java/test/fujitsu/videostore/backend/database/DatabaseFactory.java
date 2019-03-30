@@ -363,14 +363,103 @@ public class DatabaseFactory {
 
                             }
 
-                            // TODO: add orders to WRITER
+                            // TODO: add orders to WRITER: start from here
+
+                            final List<RentOrder> orderList = new ArrayList<>();
 
 
-                            PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\Result.json");
-                            pwr.write(jo.toJSONString());
-                            pwr.flush();
-                            pwr.close();
+                                JSONArray orderArray = (JSONArray) jsonObject.get("order");
 
+                                for (int i = 0; i < orderArray.size(); i++) {
+                                    RentOrder order = new RentOrder();
+
+                                    JSONObject orderData = (JSONObject) orderArray.get(i);
+
+                                    Number id = (Number) orderData.get("id");
+                                    order.setId(id.intValue());
+                                    Number customer = (Number) orderData.get("customer");
+                                    order.setCustomer(getCustomerTable().findById(customer.intValue()));
+
+                                    String orderDate = (String) orderData.get("orderDate");
+                                    LocalDate localDate = LocalDate.from(DateTimeFormatter.ISO_LOCAL_DATE.parse(orderDate));
+                                    order.setOrderDate(localDate);
+
+                                    JSONArray itemsArray = (JSONArray) orderData.get("items");
+                                    List<RentOrder.Item> orderItems = new ArrayList<>();
+
+                                    for (int j = 0; j < itemsArray.size(); j++) {
+
+                                        JSONObject itemData = (JSONObject) itemsArray.get(j);
+                                        RentOrder.Item item = new RentOrder.Item();
+
+                                        Number movie = (Number) itemData.get("movie");
+                                        item.setMovie(getMovieTable().findById(movie.intValue()));
+
+                                        Number aMovieType = (Number) itemData.get("type");
+                                        switch (aMovieType.intValue()) {
+                                            case 1:
+                                                MovieType mt1 = MovieType.NEW;
+                                                item.setMovieType(mt1);
+                                            case 2:
+                                                MovieType mt2 = MovieType.REGULAR;
+                                                item.setMovieType(mt2);
+                                            case 3:
+                                                MovieType mt3 = MovieType.OLD;
+                                                item.setMovieType(mt3);
+                                        }
+                                        Number days = (Number) itemData.get("days");
+                                        item.setDays(days.intValue());
+                                        Boolean paidByBonus = (Boolean) itemData.get("paidByBonus");
+                                        item.setPaidByBonus(paidByBonus);
+                                        String returnedDay = (String) itemData.get("returnedDay");
+                                        if (returnedDay != null) {
+                                            LocalDate localDateReturned = LocalDate.from(DateTimeFormatter.ISO_LOCAL_DATE.parse(returnedDay));
+                                            item.setReturnedDay(localDateReturned);
+                                        }
+
+                                        orderItems.add(item);
+                                    }
+                                    order.setItems(orderItems);
+                                    orderList.add(order);
+                                    //writing back to file
+                                    JSONObject orderObject = new JSONObject();
+                                    JSONObject itemsObject = new JSONObject();
+                                    // JSONObject mainObject=new JSONObject();
+
+                                    JSONArray orderArrayW = new JSONArray();
+                                    JSONArray itemsArrayW = new JSONArray();
+
+
+                                    for (int t = 0; t < orderList.size(); t++) {
+                                            orderObject = new JSONObject();
+                                            itemsArrayW = new JSONArray();
+
+                                            orderObject.put("id", orderList.get(t).getId());
+                                            orderObject.put("customer", orderList.get(t).getCustomer().getId());
+                                            orderObject.put("orderDate", orderList.get(t).getOrderDate());
+                                            orderArrayW.add(orderObject);
+
+                                            for (int j = 0; j < orderList.get(t).getItems().size(); j++) {
+                                                itemsObject = new JSONObject();
+                                                itemsObject.put("movie", orderList.get(t).getItems().get(j).getMovie().getId());
+                                                itemsObject.put("type", orderList.get(t).getItems().get(j).getMovieType().getDatabaseId());
+                                                itemsObject.put("paidByBonus", orderList.get(t).getItems().get(j).isPaidByBonus());
+                                                itemsObject.put("days", orderList.get(t).getItems().get(j).getDays());
+                                                itemsObject.put("returnedDay", orderList.get(t).getItems().get(j).getReturnedDay());
+                                                itemsArrayW.add(itemsObject);
+                                        }
+                                        orderObject.put("items", itemsArrayW);
+                                    }
+                                    jo.put("order", orderArrayW);
+
+                                    //TODO: end of writing order back to file
+
+
+                                    PrintWriter pwr = new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\Result.json");
+                                    pwr.write(jo.toJSONString());
+                                    pwr.flush();
+                                    pwr.close();
+                                }
 
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
@@ -502,49 +591,6 @@ public class DatabaseFactory {
                     public boolean remove(RentOrder object) {
 
                         try {
-
-/*
-                            ObjectMapper objMapper = new ObjectMapper();
-
-                            for (int i=0;i<orderList.size();i++) {
-
-                                RentOrder rentOrder = new RentOrder();
-                                rentOrder.getId() = orderList.get(i).getId();
-                                rentOrder.getCustomer().getId() = orderList.get(i).getCustomer().getId();
-                                rentOrder.getOrderDate() = orderList.get(i).getOrderDate();
-                                objMapper.writeValue(new FileOutputStream("C:\\Users\\reelyka.laheb\\Desktop\\Java\\OrdersWritingBack.json"), rentOrder);
-
-                            }
-
-                            String json="";
-
-                            for (int k=0;k<orderList.size();k++) {
-                                Map<String, Object> map = new HashMap<String, Object>();
-                                map.put("id", orderList.get(k).getId());
-                                map.put("customer", orderList.get(k).getCustomer().getId());
-                                map.put("orderDate", orderList.get(k).getOrderDate());
-
-                            json=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(map);
-
-                                JsonNode root=mapper.readTree(json);
-                                root.at.("\items").forEach
-
-                            List<Object> list =new ArrayList<>();
-
-                                list.add("movie", orderList.get(i).getItems().get(j).getMovie().getId());
-                                list.add("type", orderList.get(i).getItems().get(j).getMovieType().getDatabaseId());
-                                list.add("paidByBonus", orderList.get(j).getItems().get(j).isPaidByBonus());
-                                list.add("days", orderList.get(j).getItems().get(j).getDays());
-                                list.add("returnedDay", orderList.get(j).getItems().get(j).getReturnedDay());
-
-                                map.put("items",list);
-
-                            }
-
-                            mapper.writeValue(new File ("C:\\Users\\reelyka.laheb\\Desktop\\Java\\OrdersWritingBack.json"),mapper);
-
-                            JSONObject joMain=new JSONObject();*/
-
                             JSONObject orderObject=new JSONObject();
                             JSONObject itemsObject=new JSONObject();
                             JSONObject mainObject=new JSONObject();
@@ -575,7 +621,7 @@ public class DatabaseFactory {
 
                                           }
                                 }
-                                orderObject.put("items", itemsArray); //tostsin sulu sisse
+                                orderObject.put("items", itemsArray);
                                 }
                             mainObject.put("order",orderArray);
 
