@@ -1,5 +1,7 @@
 package test.fujitsu.videostore.backend.database;
 
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import test.fujitsu.videostore.backend.domain.Customer;
 import test.fujitsu.videostore.backend.domain.Movie;
 import test.fujitsu.videostore.backend.domain.MovieType;
@@ -135,8 +137,6 @@ public class DatabaseFactory {
                                     customerList.add(customer);
                                 }
 
-                                //write back Customer table
-                          //  JSONObject jo=new JSONObject();
                             Map mainMapC;
                             JSONArray customerArrayW=new JSONArray();
 
@@ -202,7 +202,51 @@ public class DatabaseFactory {
                         movie.setStockCount(object.getStockCount());
                         movie.setType(object.getType());
 
+
+                        try {
+
+                            Map mainMap;
+                            JSONArray movieArray=new JSONArray();
+                            JSONObject joAdd = new JSONObject();
+
+                            for (int i = 0; i < movieList.size(); i++) {
+                                mainMap = new LinkedHashMap(4);
+                                mainMap.put("id", movieList.get(i).getId());
+                                mainMap.put("name", movieList.get(i).getName());
+                                mainMap.put("stockCount", movieList.get(i).getStockCount());
+                                mainMap.put("type", movieList.get(i).getType().getDatabaseId());
+                                    movieArray.add(mainMap);
+                                    joAdd.put("movie", movieArray);
+                            }
+
+                            //add customer part
+
+                            DatabaseFactory dbF=new DatabaseFactory();
+                            final List<Customer> customerList = new ArrayList<>();
+
+                            Map mainMapC;
+                        JSONArray customerArray=new JSONArray();
+
+                        for (int i=0;i<customerList.size();i++){
+                            mainMapC=new LinkedHashMap(3);
+                            mainMapC.put("id",customerList.get(i).getId());
+                            mainMapC.put("name",customerList.get(i).getName());
+                            mainMapC.put("points",customerList.get(i).getPoints());
+                            // if (customerList.get(i).getId()!=object.getId()) {
+                            customerArray.add(mainMapC);
+                            joAdd.put("customer",customerArray);
+                        }
+
+                        //TODO
+                            PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\Result.json");
+                            pwr.write(joAdd.toJSONString());
+                            pwr.flush();
+                            pwr.close();
+                        }catch (FileNotFoundException e){
+                            e.printStackTrace();
+                        }
                         return movie;
+
                     }
 
                     @Override
@@ -305,11 +349,6 @@ public class DatabaseFactory {
                                 }
                             }
                             //write customer back to file
-                            //  getCustomerTable();
-                            //final List<Customer> customerList = new ArrayList<>();
-
-                            //JSONObject jo=new JSONObject();
-                            //Map mainMapC;
                             JSONArray customerArray=new JSONArray();
 
                             for (int i=0;i<customerList.size();i++){
@@ -421,7 +460,6 @@ public class DatabaseFactory {
                                     MovieType mt3 = MovieType.OLD;
                                     item.setMovieType(mt3);
                             }
-      //                      Number type = (Number) itemData.get("type");
                             Number days = (Number) itemData.get("days");
                             item.setDays(days.intValue());
                             Boolean paidByBonus= (Boolean) itemData.get("paidByBonus");
@@ -457,65 +495,100 @@ public class DatabaseFactory {
                         return getAll().stream().filter(order -> order.getId() == id).findFirst().get();
                     }
 
+
+
+                    //remove order object
                     @Override
                     public boolean remove(RentOrder object) {
 
                         try {
-                            JSONObject joMain=new JSONObject();
 
-                            JSONObject joItems=new JSONObject();
-                        //    Map mainMapO;
+/*
+                            ObjectMapper objMapper = new ObjectMapper();
 
-                        //    JSONArray orderArray=new JSONArray();
+                            for (int i=0;i<orderList.size();i++) {
+
+                                RentOrder rentOrder = new RentOrder();
+                                rentOrder.getId() = orderList.get(i).getId();
+                                rentOrder.getCustomer().getId() = orderList.get(i).getCustomer().getId();
+                                rentOrder.getOrderDate() = orderList.get(i).getOrderDate();
+                                objMapper.writeValue(new FileOutputStream("C:\\Users\\reelyka.laheb\\Desktop\\Java\\OrdersWritingBack.json"), rentOrder);
+
+                            }
+
+                            String json="";
+
+                            for (int k=0;k<orderList.size();k++) {
+                                Map<String, Object> map = new HashMap<String, Object>();
+                                map.put("id", orderList.get(k).getId());
+                                map.put("customer", orderList.get(k).getCustomer().getId());
+                                map.put("orderDate", orderList.get(k).getOrderDate());
+
+                            json=mapper.writerWithDefaultPrettyPrinter().writeValueAsString(map);
+
+                                JsonNode root=mapper.readTree(json);
+                                root.at.("\items").forEach
+
+                            List<Object> list =new ArrayList<>();
+
+                                list.add("movie", orderList.get(i).getItems().get(j).getMovie().getId());
+                                list.add("type", orderList.get(i).getItems().get(j).getMovieType().getDatabaseId());
+                                list.add("paidByBonus", orderList.get(j).getItems().get(j).isPaidByBonus());
+                                list.add("days", orderList.get(j).getItems().get(j).getDays());
+                                list.add("returnedDay", orderList.get(j).getItems().get(j).getReturnedDay());
+
+                                map.put("items",list);
+
+                            }
+
+                            mapper.writeValue(new File ("C:\\Users\\reelyka.laheb\\Desktop\\Java\\OrdersWritingBack.json"),mapper);
+
+                            JSONObject joMain=new JSONObject();*/
+
+                            JSONObject orderObject=new JSONObject();
+                            JSONObject itemsObject=new JSONObject();
+                            JSONObject mainObject=new JSONObject();
+
+                            JSONArray orderArray=new JSONArray();
+                            JSONArray itemsArray=new JSONArray();
+                            JSONArray mainArray=new JSONArray();
+
 
                             for (int i=0;i<orderList.size();i++) {
                                 if (orderList.get(i).getId() != object.getId()) {
+                                    orderObject=new JSONObject();
+                                    itemsArray=new JSONArray();
 
-                                    //         mainMapO=new LinkedHashMap(3);
-                                    joMain.put("id", orderList.get(i).getId());
-                                    joMain.put("customer", orderList.get(i).getCustomer().getId());
-                                    joMain.put("orderDate", orderList.get(i).getOrderDate());
+                                        orderObject.put("id", orderList.get(i).getId());
+                                        orderObject.put("customer", orderList.get(i).getCustomer().getId());
+                                        orderObject.put("orderDate", orderList.get(i).getOrderDate());
+                                        orderArray.add(orderObject);
 
-                                    //  orderArray.add(mainMapO);
-                                    joMain.put("order", joMain);
+                                           for (int j=0;j<orderList.get(i).getItems().size();j++) {
+                                        itemsObject = new JSONObject();
+                                        itemsObject.put("movie", orderList.get(i).getItems().get(j).getMovie().getId());
+                                        itemsObject.put("type", orderList.get(i).getItems().get(j).getMovieType().getDatabaseId());
+                                        itemsObject.put("paidByBonus", orderList.get(i).getItems().get(j).isPaidByBonus());
+                                        itemsObject.put("days", orderList.get(i).getItems().get(j).getDays());
+                                        itemsObject.put("returnedDay", orderList.get(i).getItems().get(j).getReturnedDay());
+                                        itemsArray.add(itemsObject);
 
-                                    // JSONArray itemsArray=new JSONArray();
-
-                                    for (int j = 0; j < orderList.get(i).getItems().size(); j++) {
-                                        //      Iterator it = orderList.get(i).getItems().iterator();
-                                        // while (it.hasNext()) {
-                                        joItems.put("movie", orderList.get(i).getItems().get(j).getMovie().getId());
-                                        joItems.put("type", orderList.get(i).getItems().get(j).getMovieType().getDatabaseId());
-                                        joItems.put("paidByBonus", orderList.get(j).getItems().get(j).isPaidByBonus());
-                                        joItems.put("days", orderList.get(j).getItems().get(j).getDays());
-                                        joItems.put("returnedDay", orderList.get(j).getItems().get(j).getReturnedDay());
-                                        //     itemsArray.add(mainMapO);
-                                        //joItems.put("items",itemsArray);
-                                        joMain.put("items", joItems);
-                                        // it.next();
-                                        //    }
-                                        //   j++;
-                                        //  }
-
-                                        //   orderList.get(i).getItems().iterator()
-                                        // for (int j=0;orderList.get(i).getItems().isEmpty();j++){
-                                        //        mainMapO=new LinkedHashMap(5);
-
-
-                                    }
-
+                                          }
                                 }
+                                orderObject.put("items", itemsArray); //tostsin sulu sisse
+                                }
+                            mainObject.put("order",orderArray);
 
                                 // TODO: add movies + customer to WRITER
 
 
-                                PrintWriter pwr = new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\Result.json");
-                                pwr.write(joMain.toJSONString());
+                                PrintWriter pwr = new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\DBResult.json");
+                                pwr.write(mainObject.toJSONString());
 
                                 pwr.flush();
                                 pwr.close();
 
-                            }
+
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
                         }catch (IOException e){
