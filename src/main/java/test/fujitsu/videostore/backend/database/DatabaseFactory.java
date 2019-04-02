@@ -1,11 +1,21 @@
 package test.fujitsu.videostore.backend.database;
 
+import com.fasterxml.jackson.core.JsonParser;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import test.fujitsu.videostore.backend.domain.Customer;
 import test.fujitsu.videostore.backend.domain.Movie;
 import test.fujitsu.videostore.backend.domain.MovieType;
 import test.fujitsu.videostore.backend.domain.RentOrder;
+
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
+import java.util.TimeZone;
 
 import java.io.FileNotFoundException;
 import java.io.FileReader;
@@ -20,6 +30,7 @@ import org.json.simple.JSONArray;
 import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
+import test.fujitsu.videostore.ui.order.OrderList;
 
 /**
  * Database Factory.
@@ -137,6 +148,7 @@ public class DatabaseFactory {
                                     customerList.add(customer);
                                 }
 
+                                //write customer table
                             Map mainMapC;
                             JSONArray customerArrayW=new JSONArray();
 
@@ -149,8 +161,6 @@ public class DatabaseFactory {
                                 customerArray.add(mainMapC);
                                 jo.put("customer",customerArrayW);
                                 }
-
-
 
 
                             JSONArray customerArrayN=new JSONArray();
@@ -310,156 +320,185 @@ public class DatabaseFactory {
                             final List<Movie> movieList = new ArrayList<>();
 
                             JSONParser parser = new JSONParser();
-                                Object obj = parser.parse(new FileReader(filePath));
-                                JSONObject jsonObject = (JSONObject) obj;
-                                JSONArray moviesArray = (JSONArray) jsonObject.get("movie");
+                            Object obj = parser.parse(new FileReader(filePath));
+                            JSONObject jsonObject = (JSONObject) obj;
+                            JSONArray moviesArray = (JSONArray) jsonObject.get("movie");
 
-                                for (int i = 0; i < moviesArray.size(); i++) {
-                                    Movie movie = new Movie();
+                            for (int i = 0; i < moviesArray.size(); i++) {
+                                Movie movie = new Movie();
 
-                                    JSONObject movieData = (JSONObject) moviesArray.get(i);
+                                JSONObject movieData = (JSONObject) moviesArray.get(i);
 
-                                    Number MovieId = (Number) movieData.get("id");
-                                    movie.setId(MovieId.intValue());
+                                Number MovieId = (Number) movieData.get("id");
+                                movie.setId(MovieId.intValue());
 
-                                    String MovieName = (String) movieData.get("name");
-                                    movie.setName(MovieName);
+                                String MovieName = (String) movieData.get("name");
+                                movie.setName(MovieName);
 
-                                    Number MovieStockCount = (Number) movieData.get("stockCount");
-                                    movie.setStockCount(MovieStockCount.intValue());
+                                Number MovieStockCount = (Number) movieData.get("stockCount");
+                                movie.setStockCount(MovieStockCount.intValue());
 
-                                    movieList.add(movie);
-                                }
+                                movieList.add(movie);
+                            }
 
-                                //write movies back to file
+                            //write movies back to file
 
-                            JSONObject jo=new JSONObject();
+                            JSONObject jo = new JSONObject();
                             Map mainMap;
-                            JSONArray movieArray=new JSONArray();
+                            JSONArray movieArray = new JSONArray();
 
-                            for (int i=0;i<movieList.size();i++){
-                                mainMap=new LinkedHashMap(4);
-                                mainMap.put("id",movieList.get(i).getId());
-                                mainMap.put("name",movieList.get(i).getName());
-                                mainMap.put("stockCount",movieList.get(i).getStockCount());
-                                mainMap.put("type",movieList.get(i).getType().getDatabaseId());
-                                if (movieList.get(i).getId()!=object.getId()) {
+                            for (int i = 0; i < movieList.size(); i++) {
+                                mainMap = new LinkedHashMap(4);
+                                mainMap.put("id", movieList.get(i).getId());
+                                mainMap.put("name", movieList.get(i).getName());
+                                mainMap.put("stockCount", movieList.get(i).getStockCount());
+                                mainMap.put("type", movieList.get(i).getType().getDatabaseId());
+                                if (movieList.get(i).getId() != object.getId()) {
                                     movieArray.add(mainMap);
-                                    jo.put("movie",movieArray);
+                                    jo.put("movie", movieArray);
                                 }
                             }
                             //write customer back to file
-                            JSONArray customerArray=new JSONArray();
+                            JSONArray customerArray = new JSONArray();
 
-                            for (int i=0;i<customerList.size();i++){
-                                mainMap=new LinkedHashMap(3);
-                                mainMap.put("id",customerList.get(i).getId());
-                                mainMap.put("name",customerList.get(i).getName());
-                                mainMap.put("points",customerList.get(i).getPoints());
-                                if (customerList.get(i).getId()!=object.getId()) {
-                                        customerArray.add(mainMap);
-                                    jo.put("customer",customerArray);
+                            for (int i = 0; i < customerList.size(); i++) {
+                                mainMap = new LinkedHashMap(3);
+                                mainMap.put("id", customerList.get(i).getId());
+                                mainMap.put("name", customerList.get(i).getName());
+                                mainMap.put("points", customerList.get(i).getPoints());
+                                if (customerList.get(i).getId() != object.getId()) {
+                                    customerArray.add(mainMap);
+                                    jo.put("customer", customerArray);
                                 }
 
                             }
 
                             // TODO: add orders to WRITER: start from here
+                            //get Orders
+                                final List<RentOrder> orderList = new ArrayList<>();
 
-                            final List<RentOrder> orderList = new ArrayList<>();
+                            JSONArray orderArray = (JSONArray) jsonObject.get("order");
 
+                            for (int i = 0; i < orderArray.size(); i++) {
+                                RentOrder order = new RentOrder();
 
-                                JSONArray orderArray = (JSONArray) jsonObject.get("order");
+                                JSONObject orderData = (JSONObject) orderArray.get(i);
 
-                                for (int i = 0; i < orderArray.size(); i++) {
-                                    RentOrder order = new RentOrder();
+                                Number id = (Number) orderData.get("id");
+                                order.setId(id.intValue());
+                                Number customer = (Number) orderData.get("customer");
+                                order.setCustomer(getCustomerTable().findById(customer.intValue()));
 
-                                    JSONObject orderData = (JSONObject) orderArray.get(i);
+                                String orderDate = (String) orderData.get("orderDate");
+                                LocalDate localDate = LocalDate.from(DateTimeFormatter.ISO_LOCAL_DATE.parse(orderDate));
+                                order.setOrderDate(localDate);
 
-                                    Number id = (Number) orderData.get("id");
-                                    order.setId(id.intValue());
-                                    Number customer = (Number) orderData.get("customer");
-                                    order.setCustomer(getCustomerTable().findById(customer.intValue()));
+                                JSONArray itemsArray = (JSONArray) orderData.get("items");
+                                List<RentOrder.Item> orderItems = new ArrayList<>();
 
-                                    String orderDate = (String) orderData.get("orderDate");
-                                    LocalDate localDate = LocalDate.from(DateTimeFormatter.ISO_LOCAL_DATE.parse(orderDate));
-                                    order.setOrderDate(localDate);
+                                for (int j = 0; j < itemsArray.size(); j++) {
 
-                                    JSONArray itemsArray = (JSONArray) orderData.get("items");
-                                    List<RentOrder.Item> orderItems = new ArrayList<>();
+                                    JSONObject itemData = (JSONObject) itemsArray.get(j);
+                                    RentOrder.Item item = new RentOrder.Item();
 
-                                    for (int j = 0; j < itemsArray.size(); j++) {
+                                    Number movie = (Number) itemData.get("movie");
+                                    item.setMovie(getMovieTable().findById(movie.intValue()));
 
-                                        JSONObject itemData = (JSONObject) itemsArray.get(j);
-                                        RentOrder.Item item = new RentOrder.Item();
-
-                                        Number movie = (Number) itemData.get("movie");
-                                        item.setMovie(getMovieTable().findById(movie.intValue()));
-
-                                        Number aMovieType = (Number) itemData.get("type");
-                                        switch (aMovieType.intValue()) {
-                                            case 1:
-                                                MovieType mt1 = MovieType.NEW;
-                                                item.setMovieType(mt1);
-                                            case 2:
-                                                MovieType mt2 = MovieType.REGULAR;
-                                                item.setMovieType(mt2);
-                                            case 3:
-                                                MovieType mt3 = MovieType.OLD;
-                                                item.setMovieType(mt3);
-                                        }
-                                        Number days = (Number) itemData.get("days");
-                                        item.setDays(days.intValue());
-                                        Boolean paidByBonus = (Boolean) itemData.get("paidByBonus");
-                                        item.setPaidByBonus(paidByBonus);
-                                        String returnedDay = (String) itemData.get("returnedDay");
-                                        if (returnedDay != null) {
-                                            LocalDate localDateReturned = LocalDate.from(DateTimeFormatter.ISO_LOCAL_DATE.parse(returnedDay));
-                                            item.setReturnedDay(localDateReturned);
-                                        }
-
-                                        orderItems.add(item);
+                                    Number aMovieType = (Number) itemData.get("type");
+                                    switch (aMovieType.intValue()) {
+                                        case 1:
+                                            MovieType mt1 = MovieType.NEW;
+                                            item.setMovieType(mt1);
+                                        case 2:
+                                            MovieType mt2 = MovieType.REGULAR;
+                                            item.setMovieType(mt2);
+                                        case 3:
+                                            MovieType mt3 = MovieType.OLD;
+                                            item.setMovieType(mt3);
                                     }
-                                    order.setItems(orderItems);
-                                    orderList.add(order);
-                                    //writing back to file
-                                    JSONObject orderObject = new JSONObject();
-                                    JSONObject itemsObject = new JSONObject();
-                                    // JSONObject mainObject=new JSONObject();
-
-                                    JSONArray orderArrayW = new JSONArray();
-                                    JSONArray itemsArrayW = new JSONArray();
-
-
-                                    for (int t = 0; t < orderList.size(); t++) {
-                                            orderObject = new JSONObject();
-                                            itemsArrayW = new JSONArray();
-
-                                            orderObject.put("id", orderList.get(t).getId());
-                                            orderObject.put("customer", orderList.get(t).getCustomer().getId());
-                                            orderObject.put("orderDate", orderList.get(t).getOrderDate());
-                                            orderArrayW.add(orderObject);
-
-                                            for (int j = 0; j < orderList.get(t).getItems().size(); j++) {
-                                                itemsObject = new JSONObject();
-                                                itemsObject.put("movie", orderList.get(t).getItems().get(j).getMovie().getId());
-                                                itemsObject.put("type", orderList.get(t).getItems().get(j).getMovieType().getDatabaseId());
-                                                itemsObject.put("paidByBonus", orderList.get(t).getItems().get(j).isPaidByBonus());
-                                                itemsObject.put("days", orderList.get(t).getItems().get(j).getDays());
-                                                itemsObject.put("returnedDay", orderList.get(t).getItems().get(j).getReturnedDay());
-                                                itemsArrayW.add(itemsObject);
-                                        }
-                                        orderObject.put("items", itemsArrayW);
+                                    Number days = (Number) itemData.get("days");
+                                    item.setDays(days.intValue());
+                                    Boolean paidByBonus = (Boolean) itemData.get("paidByBonus");
+                                    item.setPaidByBonus(paidByBonus);
+                                    String returnedDay = (String) itemData.get("returnedDay");
+                                    if (returnedDay != null) {
+                                        LocalDate localDateReturned = LocalDate.from(DateTimeFormatter.ISO_LOCAL_DATE.parse(returnedDay));
+                                        item.setReturnedDay(localDateReturned);
                                     }
-                                    jo.put("order", orderArrayW);
 
-                                    //TODO: end of writing order back to file
-
-
-                                    PrintWriter pwr = new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\Result.json");
-                                    pwr.write(jo.toJSONString());
-                                    pwr.flush();
-                                    pwr.close();
+                                    orderItems.add(item);
                                 }
+                                order.setItems(orderItems);
+                                orderList.add(order);
+                                //end of getting orders from file
+
+                                //write orders back to file
+                                JSONObject orderObject = new JSONObject();
+                                JSONObject itemsObject = new JSONObject();
+
+                                JSONArray orderArrayW = new JSONArray();
+                                JSONArray itemsArrayW = new JSONArray();
+
+                                int year;
+                                int month;
+                                int day;
+
+                                LocalDate returnedDate;
+                                LocalDate localDateOriginalValue;
+                                DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+                                String formattedDate;
+
+                                for (int t = 0; t < orderList.size(); t++) {
+                                    orderObject = new JSONObject();
+                                    itemsArrayW = new JSONArray();
+
+                                    orderObject.put("id", orderList.get(t).getId());
+                                    orderObject.put("customer", orderList.get(t).getCustomer().getId());
+
+                                    year=orderList.get(t).getOrderDate().getYear();
+                                    month=orderList.get(t).getOrderDate().getMonthValue();
+                                    day=orderList.get(t).getOrderDate().getDayOfMonth();
+
+                                    returnedDate=LocalDate.of(year,month,day);
+                                    formattedDate=formatter.format(returnedDate);
+
+                                    orderObject.put("orderDate", formattedDate);
+                                    orderArrayW.add(orderObject);
+
+                                    for (int j = 0; j < orderList.get(t).getItems().size(); j++) {
+                                        itemsObject = new JSONObject();
+                                        itemsObject.put("movie", orderList.get(t).getItems().get(j).getMovie().getId());
+                                        itemsObject.put("type", orderList.get(t).getItems().get(j).getMovieType().getDatabaseId());
+                                        itemsObject.put("paidByBonus", orderList.get(t).getItems().get(j).isPaidByBonus());
+                                        itemsObject.put("days", orderList.get(t).getItems().get(j).getDays());
+
+                                        localDateOriginalValue= orderList.get(t).getItems().get(j).getReturnedDay();
+                                        if(localDateOriginalValue !=null){
+                                            year=orderList.get(t).getItems().get(j).getReturnedDay().getYear();
+                                            month=orderList.get(t).getItems().get(j).getReturnedDay().getMonthValue();
+                                            day=orderList.get(t).getItems().get(j).getReturnedDay().getDayOfMonth();
+
+                                            returnedDate=LocalDate.of(year,month,day);
+                                            formattedDate=formatter.format(returnedDate);
+                                            itemsObject.put("returnedDay", formattedDate);
+                                        }else {
+                                            itemsObject.put("returnedDay", orderList.get(t).getItems().get(j).getReturnedDay());
+
+                                        }
+
+                                        itemsArrayW.add(itemsObject);
+                                    }
+                                    orderObject.put("items", itemsArrayW);
+                                }
+                                jo.put("order", orderArrayW);
+
+                            }
+                            //TODO: end of writing order back to file
+
+                            PrintWriter pwr = new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\RemoveCustomer.json");
+                            pwr.write(jo.toJSONString());
+                            pwr.flush();
+                            pwr.close();
 
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
@@ -592,47 +631,77 @@ public class DatabaseFactory {
 
                         try {
                             JSONObject orderObject=new JSONObject();
-                            JSONObject itemsObject=new JSONObject();
+                            JSONObject itemsObject;
                             JSONObject mainObject=new JSONObject();
 
                             JSONArray orderArray=new JSONArray();
                             JSONArray itemsArray=new JSONArray();
-                            JSONArray mainArray=new JSONArray();
+                           // JSONArray itemsArrayW=new JSONArray();
 
+                            int year;
+                            int month;
+                            int day;
+
+                            LocalDate returnedDate;
+                            LocalDate localDateOriginalValue;
+                            DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+                            String formattedDate;
 
                             for (int i=0;i<orderList.size();i++) {
                                 if (orderList.get(i).getId() != object.getId()) {
-                                    orderObject=new JSONObject();
-                                    itemsArray=new JSONArray();
+                                orderObject = new JSONObject();
+                                itemsArray = new JSONArray();
 
-                                        orderObject.put("id", orderList.get(i).getId());
-                                        orderObject.put("customer", orderList.get(i).getCustomer().getId());
-                                        orderObject.put("orderDate", orderList.get(i).getOrderDate());
-                                        orderArray.add(orderObject);
+                                orderObject.put("id", orderList.get(i).getId());
+                                orderObject.put("customer", orderList.get(i).getCustomer().getId());
 
-                                           for (int j=0;j<orderList.get(i).getItems().size();j++) {
-                                        itemsObject = new JSONObject();
-                                        itemsObject.put("movie", orderList.get(i).getItems().get(j).getMovie().getId());
-                                        itemsObject.put("type", orderList.get(i).getItems().get(j).getMovieType().getDatabaseId());
-                                        itemsObject.put("paidByBonus", orderList.get(i).getItems().get(j).isPaidByBonus());
-                                        itemsObject.put("days", orderList.get(i).getItems().get(j).getDays());
+                                year = orderList.get(i).getOrderDate().getYear();
+                                month = orderList.get(i).getOrderDate().getMonthValue();
+                                day = orderList.get(i).getOrderDate().getDayOfMonth();
+
+                                returnedDate = LocalDate.of(year, month, day);
+                                formattedDate = formatter.format(returnedDate);
+                                orderObject.put("orderDate", formattedDate);
+                                orderArray.add(orderObject);
+
+                                for (int j = 0; j < orderList.get(i).getItems().size(); j++) {
+                                    itemsObject = new JSONObject();
+                                    itemsObject.put("movie", orderList.get(i).getItems().get(j).getMovie().getId());
+                                    itemsObject.put("type", orderList.get(i).getItems().get(j).getMovieType().getDatabaseId());
+                                    itemsObject.put("paidByBonus", orderList.get(i).getItems().get(j).isPaidByBonus());
+                                    itemsObject.put("days", orderList.get(i).getItems().get(j).getDays());
+
+                                    localDateOriginalValue = orderList.get(i).getItems().get(j).getReturnedDay();
+                                    if (localDateOriginalValue != null) {
+                                        year = orderList.get(i).getItems().get(j).getReturnedDay().getYear();
+                                        month = orderList.get(i).getItems().get(j).getReturnedDay().getMonthValue();
+                                        day = orderList.get(i).getItems().get(j).getReturnedDay().getDayOfMonth();
+                                        returnedDate = LocalDate.of(year, month, day);
+                                        formattedDate = formatter.format(returnedDate);
+
+                                        itemsObject.put("returnedDay", formattedDate);
+
+                                    } else {
                                         itemsObject.put("returnedDay", orderList.get(i).getItems().get(j).getReturnedDay());
-                                        itemsArray.add(itemsObject);
-
-                                          }
+                                    }
+                                    itemsArray.add(itemsObject);
                                 }
                                 orderObject.put("items", itemsArray);
-                                }
-                            mainObject.put("order",orderArray);
 
-                                // TODO: add movies + customer to WRITER
+                                mainObject.put("order", orderArray); }
+                            }
+
+                            // TODO: add movies + customer to WRITER
+                            //write customer back to file
+
+                            //upper is helper lines
 
 
-                                PrintWriter pwr = new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\DBResult.json");
-                                pwr.write(mainObject.toJSONString());
+                            PrintWriter pwr = new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\RemoveOrders.json");
+                            pwr.write(mainObject.toJSONString());
 
-                                pwr.flush();
-                                pwr.close();
+                            pwr.flush();
+                            pwr.close();
 
 
                         } catch (FileNotFoundException e) {
@@ -643,6 +712,7 @@ public class DatabaseFactory {
 
                         return orderList.remove(object);
                     }
+
 
                     @Override
                     public RentOrder createOrUpdate(RentOrder object) {
