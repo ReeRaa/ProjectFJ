@@ -630,14 +630,58 @@ public class DatabaseFactory {
                     public boolean remove(RentOrder object) {
 
                         try {
+
+                            //  getCustomerTable();
+                            final List<Customer> customerList = new ArrayList<>();
+
+                            Object obj = parser.parse(new FileReader(filePath));
+                            JSONObject jsonObject = (JSONObject) obj;
+                            JSONArray customerArray = (JSONArray) jsonObject.get("customer");
+                            for (int i = 0; i < customerArray.size(); i++) {
+                                Customer customer = new Customer();
+
+                                JSONObject customerData = (JSONObject) customerArray.get(i);
+                                Number id = (Number) customerData.get("id");
+                                customer.setId(id.intValue());
+                                String name = (String) customerData.get("name");
+                                customer.setName(name);
+                                Number points = (Number) customerData.get("points");
+                                customer.setPoints(points.intValue());
+                                customerList.add(customer);
+                            }
+
+                            //write customer table
+                            JSONObject mainObject=new JSONObject();
+                            Map mainMap;
+                            Map mainMapC;
+                            JSONArray customerArrayW=new JSONArray();
+
+                            for (int i=0;i<customerList.size();i++){
+                                mainMapC=new LinkedHashMap(3);
+                                mainMapC.put("id",customerList.get(i).getId());
+                                mainMapC.put("name",customerList.get(i).getName());
+                                mainMapC.put("points",customerList.get(i).getPoints());
+                                customerArray.add(mainMapC);
+                                mainObject.put("customer",customerArrayW);
+                            }
+
+                            JSONArray customerArrayN=new JSONArray();
+
+                            for (int i=0;i<customerList.size();i++){
+                                mainMap=new LinkedHashMap(3);
+                                mainMap.put("id",customerList.get(i).getId());
+                                mainMap.put("name",customerList.get(i).getName());
+                                mainMap.put("points",customerList.get(i).getPoints());
+                                customerArrayN.add(mainMap);
+                                mainObject.put("customer",customerArrayN);
+                            }
+
+                            //write Orders to file
                             JSONObject orderObject=new JSONObject();
                             JSONObject itemsObject;
-                            JSONObject mainObject=new JSONObject();
 
                             JSONArray orderArray=new JSONArray();
                             JSONArray itemsArray=new JSONArray();
-                           // JSONArray itemsArrayW=new JSONArray();
-
                             int year;
                             int month;
                             int day;
@@ -691,10 +735,48 @@ public class DatabaseFactory {
                                 mainObject.put("order", orderArray); }
                             }
 
+                            //read in movies from file
+                            final List<Movie> movieList = new ArrayList<>();
+
+                            JSONParser parser = new JSONParser();
+                           // Object obj = parser.parse(new FileReader(filePath));
+                            //JSONObject jsonObject = (JSONObject) obj;
+                            JSONArray moviesArray = (JSONArray) jsonObject.get("movie");
+
+                            for (int i = 0; i < moviesArray.size(); i++) {
+                                Movie movie = new Movie();
+
+                                JSONObject movieData = (JSONObject) moviesArray.get(i);
+
+                                Number MovieId = (Number) movieData.get("id");
+                                movie.setId(MovieId.intValue());
+
+                                String MovieName = (String) movieData.get("name");
+                                movie.setName(MovieName);
+
+                                Number MovieStockCount = (Number) movieData.get("stockCount");
+                                movie.setStockCount(MovieStockCount.intValue());
+
+                                movieList.add(movie);
+                            }
+
+                            //write movies back to file
+                            JSONArray movieArray = new JSONArray();
+
+                            for (int i = 0; i < movieList.size(); i++) {
+                                mainMap = new LinkedHashMap(4);
+                                mainMap.put("id", movieList.get(i).getId());
+                                mainMap.put("name", movieList.get(i).getName());
+                                mainMap.put("stockCount", movieList.get(i).getStockCount());
+                                mainMap.put("type", movieList.get(i).getType().getDatabaseId());
+                                if (movieList.get(i).getId() != object.getId()) {
+                                    movieArray.add(mainMap);
+                                    mainObject.put("movie", movieArray);
+                                }
+                            }
+
                             // TODO: add movies + customer to WRITER
                             //write customer back to file
-
-                            //upper is helper lines
 
 
                             PrintWriter pwr = new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\RemoveOrders.json");
@@ -707,6 +789,8 @@ public class DatabaseFactory {
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
                         }catch (IOException e){
+                            e.printStackTrace();
+                        }catch (ParseException e){
                             e.printStackTrace();
                         }
 
