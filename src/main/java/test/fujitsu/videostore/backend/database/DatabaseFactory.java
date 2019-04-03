@@ -114,12 +114,14 @@ public class DatabaseFactory {
                             movieArray.add(mainMap);
 
                             for (int i = 0; i < movieList.size(); i++) {
-                                mainMap = new LinkedHashMap(4);
-                                mainMap.put("id", movieList.get(i).getId());
-                                mainMap.put("name", movieList.get(i).getName());
-                                mainMap.put("stockCount", movieList.get(i).getStockCount());
-                                mainMap.put("type", movieList.get(i).getType().getDatabaseId());
-                                movieArray.add(mainMap);
+                                if (object.getId()!= movieList.get(i).getId()) {
+                                    mainMap = new LinkedHashMap(4);
+                                    mainMap.put("id", movieList.get(i).getId());
+                                    mainMap.put("name", movieList.get(i).getName());
+                                    mainMap.put("stockCount", movieList.get(i).getStockCount());
+                                    mainMap.put("type", movieList.get(i).getType().getDatabaseId());
+                                    movieArray.add(mainMap);
+                                }
                             }
                        return  movieArray;
                     }
@@ -169,37 +171,6 @@ public class DatabaseFactory {
                         return movie;
                     }
 
-/*                    //method to write customer back to file
-                    public Customer writeCustomerBackToFile() {
-                        Customer customer = new Customer();
-                        try{
-                        Map mainMapC;
-                        Map mainMap;
-                        JSONArray customerArray = new JSONArray();
-                        JSONArray customerArrayW = new JSONArray();
-                        JSONArray customerArrayN = new JSONArray();
-                        JSONObject jo=new JSONObject();
-                        List customerList=new LinkedList(getCustomerList());
-
-                        for (int i = 0; i < customerList.size(); i++) {
-                            mainMapC = new LinkedHashMap(3);
-                            mainMapC.put("id", getCustomerList().get(i).getId());
-                            mainMapC.put("name", getCustomerList().get(i).getName());
-                            mainMapC.put("points", getCustomerList().get(i).getPoints());
-
-                            customerArray.add(mainMapC);
-                            jo.put("customer", customerArrayW);
-                        }
-                            PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\createOrUpdateMovie.json");
-                            //PrintWriter pwr=new PrintWriter(filePath);
-                            pwr.write(jo.toJSONString());
-                            pwr.flush();
-                            pwr.close();
-                        }catch (FileNotFoundException e){
-                            e.printStackTrace();
-                        }
-                        return customer;
-                    }*/
 
                     @Override
                     public Movie createOrUpdate(Movie object) {
@@ -543,11 +514,65 @@ public class DatabaseFactory {
                         }catch (IOException e){
                             e.printStackTrace();
                         }
-
-
                         return customerList.remove(object);
                     }
 
+
+                    //method to write movies into Array
+                    public JSONArray createCustomerArrayforWritingBackInsideCustomer(Customer object) {
+                        Customer customer=findById((object.getId()));
+
+                        Map mainMap;
+                        JSONObject jo = new JSONObject();
+                        JSONObject joW = new JSONObject();
+                        JSONArray customerArray = new JSONArray();
+                        mainMap = new LinkedHashMap(4);
+
+                        mainMap.put("id", object.getId());
+                        mainMap.put("name", object.getName());
+                        mainMap.put("points", object.getPoints());
+                        customerArray.add(mainMap);
+
+                        for (int i = 0; i < customerList.size(); i++) {
+                            if (object.getId()!= customerList.get(i).getId()) {
+                                mainMap = new LinkedHashMap(4);
+                                mainMap.put("id", customerList.get(i).getId());
+                                mainMap.put("name", customerList.get(i).getName());
+                                mainMap.put("points", customerList.get(i).getPoints());
+                                customerArray.add(mainMap);
+                            }
+                        }
+
+                        return  customerArray;
+                    }
+
+                    //method to write for Customer:  movie + customer + order back to file
+                    public Customer writeCustomerBackToFile(Customer object){
+                        Customer customer=findById((object.getId()));
+
+                        try {
+                            Map mainMap;
+                            JSONObject jo=new JSONObject();
+                            JSONArray customerArray=new JSONArray();
+                            mainMap = new LinkedHashMap(4);
+
+                            jo.put("movie", createMovieArrayforWritingBack());
+                            jo.put("customer",createCustomerArrayforWritingBackInsideCustomer(object));
+                            jo.put("order", createOrdersArrayForWritingBack());
+
+                            //printer part
+                            PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\createOrUpdateMovie.json");
+                            //PrintWriter pwr=new PrintWriter(filePath);
+                            pwr.write(jo.toJSONString());
+                            pwr.flush();
+                            pwr.close();
+                        }catch (FileNotFoundException e){
+                            e.printStackTrace();
+                        }
+                        return customer;
+                    }
+
+                    //TODO: for next
                     @Override
                     public Customer createOrUpdate(Customer object) {
                         if (object == null) {
@@ -557,6 +582,8 @@ public class DatabaseFactory {
                         if (object.isNewObject()) {
                             object.setId(generateNextId());
                             customerList.add(object);
+                            writeCustomerBackToFile(object);
+
                             return object;
                         }
 
@@ -564,7 +591,7 @@ public class DatabaseFactory {
 
                         customer.setName(object.getName());
                         customer.setPoints(object.getPoints());
-
+                        writeCustomerBackToFile(object);
                         return customer;
                     }
 
@@ -666,7 +693,6 @@ public class DatabaseFactory {
                     public boolean remove(RentOrder object) {
 
                         try {
-
                             //  getCustomerTable();
                             final List<Customer> customerList = new ArrayList<>();
 
