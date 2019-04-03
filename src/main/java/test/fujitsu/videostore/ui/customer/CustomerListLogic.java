@@ -1,9 +1,20 @@
 package test.fujitsu.videostore.ui.customer;
 
 import com.vaadin.flow.component.UI;
+import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
+import org.json.simple.parser.JSONParser;
+import org.json.simple.parser.ParseException;
 import test.fujitsu.videostore.backend.database.DBTableRepository;
 import test.fujitsu.videostore.backend.domain.Customer;
 import test.fujitsu.videostore.ui.database.CurrentDatabase;
+
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CustomerListLogic {
 
@@ -103,4 +114,43 @@ public class CustomerListLogic {
     public void rowSelected(Customer customer) {
         editCustomer(customer);
     }
+
+    //I ADDED NEW METHOD WHICH CAN BE MAYBE REUSED???
+    public List<Customer> getCustomerList() {
+
+        final List<Customer> customerList = new ArrayList<>();
+
+        JSONParser parser = new JSONParser();
+        try {
+            Object obj = parser.parse(new FileReader("C:\\Users\\reelyka.laheb\\Desktop\\Java\\getCustomerList.json"));
+            JSONObject jsonObject = (JSONObject) obj;
+            JSONArray customerArray = (JSONArray) jsonObject.get("customer");
+
+
+            for (int i = 0; i < customerArray.size(); i++) {
+                Customer customer = new Customer();
+
+                JSONObject customerData = (JSONObject) customerArray.get(i);
+                Number id = (Number) customerData.get("id");
+                customer.setId(id.intValue());
+                String name = (String) customerData.get("name");
+                customer.setName(name);
+                Number points = (Number) customerData.get("points");
+                customer.setPoints(points.intValue());
+
+                customerList.add(customer);
+            }
+
+
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }catch (ParseException e){
+            e.printStackTrace();
+        }catch (IOException e){
+            e.printStackTrace();
+        }
+
+        return customerList;
+    }
+
 }
