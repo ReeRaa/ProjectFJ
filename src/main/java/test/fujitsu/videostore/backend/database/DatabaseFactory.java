@@ -98,7 +98,7 @@ public class DatabaseFactory {
                     }
 
                     //method to write movies into Array
-                    public JSONArray createMovieArrayforWritingBack(Movie object) {
+                    public JSONArray createMovieArrayforWritingBackInsideMovie(Movie object) {
                         Movie movie = findById(object.getId());
 
                             Map mainMap;
@@ -153,7 +153,7 @@ public class DatabaseFactory {
                             JSONArray movieArray=new JSONArray();
                             mainMap = new LinkedHashMap(4);
 
-                            jo.put("movie",createMovieArrayforWritingBack(object));
+                            jo.put("movie", createMovieArrayforWritingBackInsideMovie(object));
                             jo.put("customer",createCustomersArrayForWritingBack());
                             jo.put("order", createOrdersArrayForWritingBack());
 
@@ -227,6 +227,25 @@ public class DatabaseFactory {
                         return movieList.size() + 1; //add static variable
                     }
                 };
+            }
+
+            //method to write movies into Array
+            public JSONArray createMovieArrayforWritingBack() {
+                Map mainMap;
+                JSONObject jo = new JSONObject();
+                JSONObject joW = new JSONObject();
+                JSONArray movieArray = new JSONArray();
+                mainMap = new LinkedHashMap(4);
+
+                for (int i = 0; i < getMoviesList().size(); i++) {
+                    mainMap = new LinkedHashMap(4);
+                    mainMap.put("id", getMoviesList().get(i).getId());
+                    mainMap.put("name", getMoviesList().get(i).getName());
+                    mainMap.put("stockCount", getMoviesList().get(i).getStockCount());
+                    mainMap.put("type", getMoviesList().get(i).getType().getDatabaseId());
+                    movieArray.add(mainMap);
+                }
+                return  movieArray;
             }
 
             //method to write rentOrders into Array
@@ -492,48 +511,12 @@ public class DatabaseFactory {
                     @Override
                     public boolean remove(Customer object) {
                         try {
-
-                            //read in movies from file
-                            final List<Movie> movieList = new ArrayList<>();
-
-                            JSONParser parser = new JSONParser();
-                            Object obj = parser.parse(new FileReader(filePath));
-                            JSONObject jsonObject = (JSONObject) obj;
-                            JSONArray moviesArray = (JSONArray) jsonObject.get("movie");
-
-                            for (int i = 0; i < moviesArray.size(); i++) {
-                                Movie movie = new Movie();
-
-                                JSONObject movieData = (JSONObject) moviesArray.get(i);
-
-                                Number MovieId = (Number) movieData.get("id");
-                                movie.setId(MovieId.intValue());
-
-                                String MovieName = (String) movieData.get("name");
-                                movie.setName(MovieName);
-
-                                Number MovieStockCount = (Number) movieData.get("stockCount");
-                                movie.setStockCount(MovieStockCount.intValue());
-
-                                movieList.add(movie);
-                            }
-
-                            //write movies back to file
-
                             JSONObject jo = new JSONObject();
                             Map mainMap;
-                            JSONArray movieArray = new JSONArray();
 
-                            for (int i = 0; i < movieList.size(); i++) {
-                                mainMap = new LinkedHashMap(4);
-                                mainMap.put("id", movieList.get(i).getId());
-                                mainMap.put("name", movieList.get(i).getName());
-                                mainMap.put("stockCount", movieList.get(i).getStockCount());
-                                mainMap.put("type", movieList.get(i).getType().getDatabaseId());
+                            jo.put("movie",createMovieArrayforWritingBack());
+                            jo.put("order",createOrdersArrayForWritingBack());
 
-                                    movieArray.add(mainMap);
-                                    jo.put("movie", movieArray);
-                            }
                             //write customer back to file
                             JSONArray customerArray = new JSONArray();
 
@@ -548,12 +531,9 @@ public class DatabaseFactory {
                                 }
 
                             }
-                            jo.put("order",createOrdersArrayForWritingBack());
-
-                            //end of writing order back to file
 
                             //PrintWriter pwr = new PrintWriter(filePath);
-                            PrintWriter pwr = new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\RemoveCustomers.json");
+                            PrintWriter pwr = new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\RemoveCustomer.json");
                             pwr.write(jo.toJSONString());
                             pwr.flush();
                             pwr.close();
@@ -561,8 +541,6 @@ public class DatabaseFactory {
                         } catch (FileNotFoundException e) {
                             e.printStackTrace();
                         }catch (IOException e){
-                            e.printStackTrace();
-                        }catch (ParseException e){
                             e.printStackTrace();
                         }
 
