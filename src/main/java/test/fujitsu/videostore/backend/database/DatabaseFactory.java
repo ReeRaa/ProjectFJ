@@ -569,6 +569,7 @@ public class DatabaseFactory {
                         return customer;
                     }
 
+
                     @Override
                     public Customer createOrUpdate(Customer object) {
                         if (object == null) {
@@ -773,6 +774,160 @@ public class DatabaseFactory {
                         return orderList.remove(object);
                     }
 
+//TODO next: update /add order
+                    //Siia abiklass array koostamiseks
+                    //method to write movies into Array
+                    public JSONArray createRentOrderArrayForWritingBackInsideOrder(RentOrder object) {
+                        RentOrder order = findById((object.getId()));
+
+                        Map mainMap;
+                        JSONObject jo = new JSONObject();
+                        JSONObject joW = new JSONObject();
+                        JSONArray ordersArray = new JSONArray();
+                        JSONArray objectArray = new JSONArray();
+                        JSONArray mainArray = new JSONArray();
+                        mainMap = new LinkedHashMap(4);
+                        //siit algab muudetav kood
+
+                        JSONObject orderObject = new JSONObject();
+                        JSONObject itemsObject;
+                        JSONObject mainObject;
+
+                        //JSONArray orderArray=new JSONArray();
+                        JSONArray itemsArray = new JSONArray();
+                        int year;
+                        int month;
+                        int day;
+
+                        LocalDate returnedDate;
+                        LocalDate orderDate;
+                        LocalDate localDateOriginalValue;
+                        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+                        String formattedDate;
+
+                        orderObject.put("id", object.getId());
+                        orderObject.put("customer", object.getCustomer().getId());
+                        year = object.getOrderDate().getYear();
+                        month = object.getOrderDate().getMonthValue();
+                        day = object.getOrderDate().getDayOfMonth();
+
+                        orderDate = LocalDate.of(year, month, day);
+                        formattedDate = formatter.format(orderDate);
+                        orderObject.put("orderDate", formattedDate);
+                        //ordersArray.add(orderObject);
+
+                        //objectArray.add(mainMap);
+
+                        for (int j = 0; j < object.getItems().size(); j++) {
+                            itemsObject = new JSONObject();
+                            itemsObject.put("movie", object.getItems().get(j).getMovie().getId());
+                            itemsObject.put("type", object.getItems().get(j).getMovieType().getDatabaseId());
+                            itemsObject.put("paidByBonus", object.getItems().get(j).isPaidByBonus());
+                            itemsObject.put("days", object.getItems().get(j).getDays());
+
+                            localDateOriginalValue = object.getItems().get(j).getReturnedDay();
+                            if (localDateOriginalValue != null) {
+                                year = object.getItems().get(j).getReturnedDay().getYear();
+                                month = object.getItems().get(j).getReturnedDay().getMonthValue();
+                                day = object.getItems().get(j).getReturnedDay().getDayOfMonth();
+                                returnedDate = LocalDate.of(year, month, day);
+                                formattedDate = formatter.format(returnedDate);
+
+                                itemsObject.put("returnedDay", formattedDate);
+
+                            } else {
+                                itemsObject.put("returnedDay", object.getItems().get(j).getReturnedDay());
+                            }
+                            itemsArray.add(itemsObject);
+                        }
+                        orderObject.put("items", itemsArray);
+
+                        mainArray.add(orderObject);
+
+                        //end of object data
+
+
+                        for (int i = 0; i < orderList.size(); i++) {
+                            if (orderList.get(i).getId() != object.getId()) {
+                                orderObject = new JSONObject();
+                                itemsArray = new JSONArray();
+
+                                orderObject.put("id", orderList.get(i).getId());
+                                orderObject.put("customer", orderList.get(i).getCustomer().getId());
+
+                                year = orderList.get(i).getOrderDate().getYear();
+                                month = orderList.get(i).getOrderDate().getMonthValue();
+                                day = orderList.get(i).getOrderDate().getDayOfMonth();
+
+                                orderDate = LocalDate.of(year, month, day);
+                                formattedDate = formatter.format(orderDate);
+                                orderObject.put("orderDate", formattedDate);
+                                mainArray.add(orderObject);
+
+                                for (int j = 0; j < orderList.get(i).getItems().size(); j++) {
+                                    itemsObject = new JSONObject();
+                                    itemsObject.put("movie", orderList.get(i).getItems().get(j).getMovie().getId());
+                                    itemsObject.put("type", orderList.get(i).getItems().get(j).getMovieType().getDatabaseId());
+                                    itemsObject.put("paidByBonus", orderList.get(i).getItems().get(j).isPaidByBonus());
+                                    itemsObject.put("days", orderList.get(i).getItems().get(j).getDays());
+
+                                    localDateOriginalValue = orderList.get(i).getItems().get(j).getReturnedDay();
+                                    if (localDateOriginalValue != null) {
+                                        year = orderList.get(i).getItems().get(j).getReturnedDay().getYear();
+                                        month = orderList.get(i).getItems().get(j).getReturnedDay().getMonthValue();
+                                        day = orderList.get(i).getItems().get(j).getReturnedDay().getDayOfMonth();
+                                        returnedDate = LocalDate.of(year, month, day);
+                                        formattedDate = formatter.format(returnedDate);
+
+                                        itemsObject.put("returnedDay", formattedDate);
+
+                                    } else {
+                                        itemsObject.put("returnedDay", orderList.get(i).getItems().get(j).getReturnedDay());
+                                    }
+
+                                    itemsArray.add(itemsObject);
+                                }
+                                orderObject.put("items", itemsArray);
+                                if (object.getId() != orderList.get(i).getId()) {
+                                    mainArray.add(orderObject);
+                                }
+                                // jo.put("order", ordersArray); }
+                            }}
+                           // ordersArray.add(objectArray);
+                           // ordersArray.add(mainArray);
+//siin loppeb muudetav kood
+                            return mainArray;
+                        }
+
+
+
+                    //siia abiklass
+                    //method to write for Customer:  movie + customer + order back to file
+                    public RentOrder writeRentOrderBackToFile(RentOrder object){
+                        RentOrder order=findById((object.getId()));
+
+                        try {
+                            Map mainMap;
+                            JSONObject jo=new JSONObject();
+                            JSONArray customerArray=new JSONArray();
+                            mainMap = new LinkedHashMap(4);
+
+                            jo.put("movie", createMovieArrayforWritingBack());
+                            jo.put("customer",createCustomersArrayForWritingBack());
+                            jo.put("order", createRentOrderArrayForWritingBackInsideOrder(object));
+
+                            //printer part
+                            PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\createOrUpdateMovie.json");
+                            //PrintWriter pwr=new PrintWriter(filePath);
+                            pwr.write(jo.toJSONString());
+                            pwr.flush();
+                            pwr.close();
+                        }catch (FileNotFoundException e){
+                            e.printStackTrace();
+                        }
+                        return order;
+                    }
+                    //abiklassi lopp
 
                     @Override
                     public RentOrder createOrUpdate(RentOrder object) {
@@ -783,6 +938,8 @@ public class DatabaseFactory {
                         if (object.isNewObject()) {
                             object.setId(generateNextId());
                             orderList.add(object);
+                            writeRentOrderBackToFile(object);
+
                             return object;
                         }
 
@@ -791,7 +948,7 @@ public class DatabaseFactory {
                         order.setCustomer(object.getCustomer());
                         order.setOrderDate(order.getOrderDate());
                         order.setItems(object.getItems());
-
+                        writeRentOrderBackToFile(object);
                         return order;
                     }
 
