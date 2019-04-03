@@ -140,69 +140,7 @@ public class DatabaseFactory {
                         return customerArray;
                     }
 
-                    //method to write rentOrders into Array
-                    public JSONArray createOrdersArrayForWritingBack(){
-                        JSONObject orderObject = new JSONObject();
-                        JSONObject itemsObject = new JSONObject();
 
-                        JSONArray ordersArray = new JSONArray();
-                        JSONArray itemsArray = new JSONArray();
-
-                        List orderList=new LinkedList(getRentOrderList());
-
-                        int year;
-                        int month;
-                        int day;
-
-                        LocalDate returnedDate;
-                        LocalDate localDateOriginalValue;
-                        DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
-                        String formattedDate;
-
-                        for (int t = 0; t < getRentOrderList().size(); t++) {
-                            orderObject = new JSONObject();
-                            itemsArray = new JSONArray();
-
-                            orderObject.put("id", getRentOrderList().get(t).getId());
-                            orderObject.put("customer",getRentOrderList().get(t).getCustomer().getId());
-
-                            year=getRentOrderList().get(t).getOrderDate().getYear();
-                            month=getRentOrderList().get(t).getOrderDate().getMonthValue();
-                            day=getRentOrderList().get(t).getOrderDate().getDayOfMonth();
-
-                            returnedDate=LocalDate.of(year,month,day);
-                            formattedDate=formatter.format(returnedDate);
-
-                            orderObject.put("orderDate", formattedDate);
-                            ordersArray.add(orderObject);
-
-                            for (int j = 0; j < getRentOrderList().get(t).getItems().size(); j++) {
-                                itemsObject = new JSONObject();
-                                itemsObject.put("movie", getRentOrderList().get(t).getItems().get(j).getMovie().getId());
-                                itemsObject.put("type", getRentOrderList().get(t).getItems().get(j).getMovieType().getDatabaseId());
-                                itemsObject.put("paidByBonus", getRentOrderList().get(t).getItems().get(j).isPaidByBonus());
-                                itemsObject.put("days", getRentOrderList().get(t).getItems().get(j).getDays());
-
-                                localDateOriginalValue= getRentOrderList().get(t).getItems().get(j).getReturnedDay();
-                                if(localDateOriginalValue !=null){
-                                    year=getRentOrderList().get(t).getItems().get(j).getReturnedDay().getYear();
-                                    month=getRentOrderList().get(t).getItems().get(j).getReturnedDay().getMonthValue();
-                                    day=getRentOrderList().get(t).getItems().get(j).getReturnedDay().getDayOfMonth();
-
-                                    returnedDate=LocalDate.of(year,month,day);
-                                    formattedDate=formatter.format(returnedDate);
-                                    itemsObject.put("returnedDay", formattedDate);
-                                }else {
-                                    itemsObject.put("returnedDay", getRentOrderList().get(t).getItems().get(j).getReturnedDay());
-
-                                }
-
-                                itemsArray.add(itemsObject);
-                            }
-                            orderObject.put("items", itemsArray);
-                        }
-                        return ordersArray;
-                    }
 
 
                     //method to write movie + customer + order back to file
@@ -291,6 +229,71 @@ public class DatabaseFactory {
                 };
             }
 
+            //method to write rentOrders into Array
+            public JSONArray createOrdersArrayForWritingBack(){
+                JSONObject orderObject = new JSONObject();
+                JSONObject itemsObject = new JSONObject();
+
+                JSONArray ordersArray = new JSONArray();
+                JSONArray itemsArray = new JSONArray();
+
+                List orderList=new LinkedList(getRentOrderList());
+
+                int year;
+                int month;
+                int day;
+
+                LocalDate returnedDate;
+                LocalDate localDateOriginalValue;
+                DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
+                String formattedDate;
+
+                for (int t = 0; t < getRentOrderList().size(); t++) {
+                    orderObject = new JSONObject();
+                    itemsArray = new JSONArray();
+
+                    orderObject.put("id", getRentOrderList().get(t).getId());
+                    orderObject.put("customer",getRentOrderList().get(t).getCustomer().getId());
+
+                    year=getRentOrderList().get(t).getOrderDate().getYear();
+                    month=getRentOrderList().get(t).getOrderDate().getMonthValue();
+                    day=getRentOrderList().get(t).getOrderDate().getDayOfMonth();
+
+                    returnedDate=LocalDate.of(year,month,day);
+                    formattedDate=formatter.format(returnedDate);
+
+                    orderObject.put("orderDate", formattedDate);
+                    ordersArray.add(orderObject);
+
+                    for (int j = 0; j < getRentOrderList().get(t).getItems().size(); j++) {
+                        itemsObject = new JSONObject();
+                        itemsObject.put("movie", getRentOrderList().get(t).getItems().get(j).getMovie().getId());
+                        itemsObject.put("type", getRentOrderList().get(t).getItems().get(j).getMovieType().getDatabaseId());
+                        itemsObject.put("paidByBonus", getRentOrderList().get(t).getItems().get(j).isPaidByBonus());
+                        itemsObject.put("days", getRentOrderList().get(t).getItems().get(j).getDays());
+
+                        localDateOriginalValue= getRentOrderList().get(t).getItems().get(j).getReturnedDay();
+                        if(localDateOriginalValue !=null){
+                            year=getRentOrderList().get(t).getItems().get(j).getReturnedDay().getYear();
+                            month=getRentOrderList().get(t).getItems().get(j).getReturnedDay().getMonthValue();
+                            day=getRentOrderList().get(t).getItems().get(j).getReturnedDay().getDayOfMonth();
+
+                            returnedDate=LocalDate.of(year,month,day);
+                            formattedDate=formatter.format(returnedDate);
+                            itemsObject.put("returnedDay", formattedDate);
+                        }else {
+                            itemsObject.put("returnedDay", getRentOrderList().get(t).getItems().get(j).getReturnedDay());
+
+                        }
+
+                        itemsArray.add(itemsObject);
+                    }
+                    orderObject.put("items", itemsArray);
+                }
+                return ordersArray;
+            }
+
+
             //added new method to get movies list
             public List<Movie> getMoviesList(){
                 final List<Movie> movieList = new ArrayList<>();
@@ -366,7 +369,7 @@ public class DatabaseFactory {
                 return customerList;
             }
 
-            //ADDED NEW METHOD FOR REUSING OF GETTING CUSTOMERS LIST
+            //ADDED NEW METHOD FOR REUSING OF GETTING Order LIST
             public List<RentOrder> getRentOrderList(){
 
                 final List<RentOrder> rentOrderList = new ArrayList<>();
@@ -545,126 +548,8 @@ public class DatabaseFactory {
                                 }
 
                             }
+                            jo.put("order",createOrdersArrayForWritingBack());
 
-                            //get Orders
-                                final List<RentOrder> orderList = new ArrayList<>();
-
-                            JSONArray orderArray = (JSONArray) jsonObject.get("order");
-
-                            for (int i = 0; i < orderArray.size(); i++) {
-                                RentOrder order = new RentOrder();
-
-                                JSONObject orderData = (JSONObject) orderArray.get(i);
-
-                                Number id = (Number) orderData.get("id");
-                                order.setId(id.intValue());
-                                Number customer = (Number) orderData.get("customer");
-                                order.setCustomer(getCustomerTable().findById(customer.intValue()));
-
-                                String orderDate = (String) orderData.get("orderDate");
-                                LocalDate localDate = LocalDate.from(DateTimeFormatter.ISO_LOCAL_DATE.parse(orderDate));
-                                order.setOrderDate(localDate);
-
-                                JSONArray itemsArray = (JSONArray) orderData.get("items");
-                                List<RentOrder.Item> orderItems = new ArrayList<>();
-
-                                for (int j = 0; j < itemsArray.size(); j++) {
-
-                                    JSONObject itemData = (JSONObject) itemsArray.get(j);
-                                    RentOrder.Item item = new RentOrder.Item();
-
-                                    Number movie = (Number) itemData.get("movie");
-                                    item.setMovie(getMovieTable().findById(movie.intValue()));
-
-                                    Number aMovieType = (Number) itemData.get("type");
-                                    switch (aMovieType.intValue()) {
-                                        case 1:
-                                            MovieType mt1 = MovieType.NEW;
-                                            item.setMovieType(mt1);
-                                        case 2:
-                                            MovieType mt2 = MovieType.REGULAR;
-                                            item.setMovieType(mt2);
-                                        case 3:
-                                            MovieType mt3 = MovieType.OLD;
-                                            item.setMovieType(mt3);
-                                    }
-                                    Number days = (Number) itemData.get("days");
-                                    item.setDays(days.intValue());
-                                    Boolean paidByBonus = (Boolean) itemData.get("paidByBonus");
-                                    item.setPaidByBonus(paidByBonus);
-                                    String returnedDay = (String) itemData.get("returnedDay");
-                                    if (returnedDay != null) {
-                                        LocalDate localDateReturned = LocalDate.from(DateTimeFormatter.ISO_LOCAL_DATE.parse(returnedDay));
-                                        item.setReturnedDay(localDateReturned);
-                                    }
-
-                                    orderItems.add(item);
-                                }
-                                order.setItems(orderItems);
-                                orderList.add(order);
-                                //end of getting orders from file
-
-                                //write orders back to file
-                                JSONObject orderObject = new JSONObject();
-                                JSONObject itemsObject = new JSONObject();
-
-                                JSONArray orderArrayW = new JSONArray();
-                                JSONArray itemsArrayW = new JSONArray();
-
-                                int year;
-                                int month;
-                                int day;
-
-                                LocalDate returnedDate;
-                                LocalDate localDateOriginalValue;
-                                DateTimeFormatter formatter = DateTimeFormatter.ISO_LOCAL_DATE;
-                                String formattedDate;
-
-                                for (int t = 0; t < orderList.size(); t++) {
-                                    orderObject = new JSONObject();
-                                    itemsArrayW = new JSONArray();
-
-                                    orderObject.put("id", orderList.get(t).getId());
-                                    orderObject.put("customer", orderList.get(t).getCustomer().getId());
-
-                                    year=orderList.get(t).getOrderDate().getYear();
-                                    month=orderList.get(t).getOrderDate().getMonthValue();
-                                    day=orderList.get(t).getOrderDate().getDayOfMonth();
-
-                                    returnedDate=LocalDate.of(year,month,day);
-                                    formattedDate=formatter.format(returnedDate);
-
-                                    orderObject.put("orderDate", formattedDate);
-                                    orderArrayW.add(orderObject);
-
-                                    for (int j = 0; j < orderList.get(t).getItems().size(); j++) {
-                                        itemsObject = new JSONObject();
-                                        itemsObject.put("movie", orderList.get(t).getItems().get(j).getMovie().getId());
-                                        itemsObject.put("type", orderList.get(t).getItems().get(j).getMovieType().getDatabaseId());
-                                        itemsObject.put("paidByBonus", orderList.get(t).getItems().get(j).isPaidByBonus());
-                                        itemsObject.put("days", orderList.get(t).getItems().get(j).getDays());
-
-                                        localDateOriginalValue= orderList.get(t).getItems().get(j).getReturnedDay();
-                                        if(localDateOriginalValue !=null){
-                                            year=orderList.get(t).getItems().get(j).getReturnedDay().getYear();
-                                            month=orderList.get(t).getItems().get(j).getReturnedDay().getMonthValue();
-                                            day=orderList.get(t).getItems().get(j).getReturnedDay().getDayOfMonth();
-
-                                            returnedDate=LocalDate.of(year,month,day);
-                                            formattedDate=formatter.format(returnedDate);
-                                            itemsObject.put("returnedDay", formattedDate);
-                                        }else {
-                                            itemsObject.put("returnedDay", orderList.get(t).getItems().get(j).getReturnedDay());
-
-                                        }
-
-                                        itemsArrayW.add(itemsObject);
-                                    }
-                                    orderObject.put("items", itemsArrayW);
-                                }
-                                jo.put("order", orderArrayW);
-
-                            }
                             //end of writing order back to file
 
                             //PrintWriter pwr = new PrintWriter(filePath);
