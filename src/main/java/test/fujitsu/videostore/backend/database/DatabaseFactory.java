@@ -775,26 +775,24 @@ public class DatabaseFactory {
                     }
 
 //TODO next: update /add order
-                    //Siia abiklass array koostamiseks
                     //method to write movies into Array
                     public JSONArray createRentOrderArrayForWritingBackInsideOrder(RentOrder object) {
-                        RentOrder order = findById((object.getId()));
+                     //   RentOrder order = findById((object.getId()));
 
-                        Map mainMap;
-                        JSONObject jo = new JSONObject();
-                        JSONObject joW = new JSONObject();
-                        JSONArray ordersArray = new JSONArray();
+                      //  Map mainMap;
+                        // mainMap = new LinkedHashMap(4);
+
+                        // JSONObject jo = new JSONObject();
+                       // JSONObject joW = new JSONObject();
+                       // JSONArray ordersArray = new JSONArray();
                         JSONArray objectArray = new JSONArray();
                         JSONArray mainArray = new JSONArray();
-                        mainMap = new LinkedHashMap(4);
-                        //siit algab muudetav kood
+                        JSONArray itemsArray = new JSONArray();
 
                         JSONObject orderObject = new JSONObject();
                         JSONObject itemsObject;
                         JSONObject mainObject;
 
-                        //JSONArray orderArray=new JSONArray();
-                        JSONArray itemsArray = new JSONArray();
                         int year;
                         int month;
                         int day;
@@ -807,12 +805,12 @@ public class DatabaseFactory {
 
                         orderObject.put("id", object.getId());
                         orderObject.put("customer", object.getCustomer().getId());
-                        year = object.getOrderDate().getYear();
-                        month = object.getOrderDate().getMonthValue();
-                        day = object.getOrderDate().getDayOfMonth();
+                            year = object.getOrderDate().getYear();
+                            month = object.getOrderDate().getMonthValue();
+                            day = object.getOrderDate().getDayOfMonth();
 
-                        orderDate = LocalDate.of(year, month, day);
-                        formattedDate = formatter.format(orderDate);
+                            orderDate = LocalDate.of(year, month, day);
+                            formattedDate = formatter.format(orderDate);
                         orderObject.put("orderDate", formattedDate);
                         //ordersArray.add(orderObject);
 
@@ -855,17 +853,18 @@ public class DatabaseFactory {
                                 orderObject.put("id", orderList.get(i).getId());
                                 orderObject.put("customer", orderList.get(i).getCustomer().getId());
 
-                                year = orderList.get(i).getOrderDate().getYear();
-                                month = orderList.get(i).getOrderDate().getMonthValue();
-                                day = orderList.get(i).getOrderDate().getDayOfMonth();
+                                    year = orderList.get(i).getOrderDate().getYear();
+                                    month = orderList.get(i).getOrderDate().getMonthValue();
+                                    day = orderList.get(i).getOrderDate().getDayOfMonth();
 
-                                orderDate = LocalDate.of(year, month, day);
-                                formattedDate = formatter.format(orderDate);
+                                    orderDate = LocalDate.of(year, month, day);
+                                    formattedDate = formatter.format(orderDate);
                                 orderObject.put("orderDate", formattedDate);
-                                mainArray.add(orderObject);
+                                //mainArray.add(orderObject);
 
                                 for (int j = 0; j < orderList.get(i).getItems().size(); j++) {
                                     itemsObject = new JSONObject();
+
                                     itemsObject.put("movie", orderList.get(i).getItems().get(j).getMovie().getId());
                                     itemsObject.put("type", orderList.get(i).getItems().get(j).getMovieType().getDatabaseId());
                                     itemsObject.put("paidByBonus", orderList.get(i).getItems().get(j).isPaidByBonus());
@@ -901,7 +900,6 @@ public class DatabaseFactory {
 
 
 
-                    //siia abiklass
                     //method to write for Customer:  movie + customer + order back to file
                     public RentOrder writeRentOrderBackToFile(RentOrder object){
                         RentOrder order=findById((object.getId()));
@@ -917,7 +915,7 @@ public class DatabaseFactory {
                             jo.put("order", createRentOrderArrayForWritingBackInsideOrder(object));
 
                             //printer part
-                            PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\createOrUpdateMovie.json");
+                            PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\createOrUpdateRentOrder.json");
                             //PrintWriter pwr=new PrintWriter(filePath);
                             pwr.write(jo.toJSONString());
                             pwr.flush();
@@ -927,7 +925,6 @@ public class DatabaseFactory {
                         }
                         return order;
                     }
-                    //abiklassi lopp
 
                     @Override
                     public RentOrder createOrUpdate(RentOrder object) {
