@@ -141,8 +141,8 @@ public class DatabaseFactory {
                             jo.put("order", createOrdersArrayForWritingBack());
 
                             //printer part
-                            PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\createOrUpdateMovie.json");
-                            //PrintWriter pwr=new PrintWriter(filePath);
+                           // PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\createOrUpdateMovie.json");
+                            PrintWriter pwr=new PrintWriter(filePath);
                             pwr.write(jo.toJSONString());
                             pwr.flush();
                             pwr.close();
@@ -501,7 +501,8 @@ public class DatabaseFactory {
                             }
 
                             //PrintWriter pwr = new PrintWriter(filePath);
-                            PrintWriter pwr = new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\RemoveCustomer.json");
+                           // PrintWriter pwr = new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\RemoveCustomer.json");
+                            PrintWriter pwr = new PrintWriter(filePath);
                             pwr.write(jo.toJSONString());
                             pwr.flush();
                             pwr.close();
@@ -558,8 +559,8 @@ public class DatabaseFactory {
                             jo.put("order", createOrdersArrayForWritingBack());
 
                             //printer part
-                            PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\createOrUpdateMovie.json");
-                            //PrintWriter pwr=new PrintWriter(filePath);
+                            // PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\createOrUpdateMovie.json");
+                          PrintWriter pwr=new PrintWriter(filePath);
                             pwr.write(jo.toJSONString());
                             pwr.flush();
                             pwr.close();
@@ -757,8 +758,8 @@ public class DatabaseFactory {
                             }
 
 
-                            PrintWriter pwr = new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\RemoveOrders.json");
-                           // PrintWriter pwr = new PrintWriter(filePath);
+                            //  PrintWriter pwr = new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\RemoveOrders.json");
+                           PrintWriter pwr = new PrintWriter(filePath);
                             pwr.write(jo.toJSONString());
 
                             pwr.flush();
@@ -915,8 +916,8 @@ public class DatabaseFactory {
                             jo.put("order", createRentOrderArrayForWritingBackInsideOrder(object));
 
                             //printer part
-                            PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\createOrUpdateRentOrder.json");
-                            //PrintWriter pwr=new PrintWriter(filePath);
+                           // PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\createOrUpdateRentOrder.json");
+                            PrintWriter pwr=new PrintWriter(filePath);
                             pwr.write(jo.toJSONString());
                             pwr.flush();
                             pwr.close();
