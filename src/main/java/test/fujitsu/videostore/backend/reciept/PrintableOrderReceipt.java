@@ -4,6 +4,7 @@ import test.fujitsu.videostore.backend.domain.MovieType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -66,12 +67,21 @@ public class PrintableOrderReceipt implements PrintableReceipt {
         this.remainingBonusPoints = remainingBonusPoints;
     }
 
+    int year;
+    int month;
+    int day;
+    LocalDate returnedDate;
+    String formattedDate;
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-YY");
+
     public String print() {
+        formattedDate=getOrderDate().format(formatter);
+
         StringBuilder receipt = new StringBuilder()
                 .append("ID: ").append(getOrderId())
                 .append("\n")
-                // TODO: Format rent date in dd-MM-YY format
-                .append("Date: ").append(getOrderDate().toString())
+                // Done TODO: Format rent date in dd-MM-YY format
+                .append("Date: ").append(formattedDate)
                 .append("\n").append("Customer: ").append(getCustomerName())
                 .append("\n");
 
