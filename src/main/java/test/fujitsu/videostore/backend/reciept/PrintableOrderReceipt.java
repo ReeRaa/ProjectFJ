@@ -3,6 +3,7 @@ package test.fujitsu.videostore.backend.reciept;
 import test.fujitsu.videostore.backend.domain.MovieType;
 
 import java.math.BigDecimal;
+import java.math.MathContext;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -51,7 +52,30 @@ public class PrintableOrderReceipt implements PrintableReceipt {
         this.orderItems = orderItems;
     }
 
+    final static BigDecimal premiumPrice=new BigDecimal("4");
+    final static BigDecimal basicPrice=new BigDecimal("3");
+
+
+    public enum RentPriceClasses {
+        PREMIUM_PRICE(premiumPrice),
+        BASIC_PRICE(basicPrice);
+
+        private BigDecimal rentPrice;
+        RentPriceClasses(BigDecimal rentPrice){
+            this.rentPrice=rentPrice;
+        }
+
+        public BigDecimal getRentPrice() {
+            return this.rentPrice;
+        }
+    }
+
+    public static BigDecimal price;
+
+
+
     public BigDecimal getTotalPrice() {
+
         return totalPrice;
     }
 
@@ -67,10 +91,7 @@ public class PrintableOrderReceipt implements PrintableReceipt {
         this.remainingBonusPoints = remainingBonusPoints;
     }
 
-    int year;
-    int month;
-    int day;
-    LocalDate returnedDate;
+
     String formattedDate;
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-YY");
 
@@ -105,6 +126,7 @@ public class PrintableOrderReceipt implements PrintableReceipt {
         return receipt.toString();
     }
 
+
     public static class Item {
 
         private String movieName;
@@ -138,6 +160,7 @@ public class PrintableOrderReceipt implements PrintableReceipt {
         }
 
         public BigDecimal getPaidMoney() {
+            paidMoney= getRentPriceCalculation(getMovieType());
             return paidMoney;
         }
 
@@ -153,6 +176,30 @@ public class PrintableOrderReceipt implements PrintableReceipt {
             this.paidBonus = paidBonus;
         }
 
+        BigDecimal defaultValue = new BigDecimal("0");
+
+        public BigDecimal getRentPriceCalculation(MovieType movieType){
+            MathContext mc=new MathContext(2);
+            switch (movieType){
+                case NEW: {price = BigDecimal.valueOf(getDays()).multiply(RentPriceClasses.PREMIUM_PRICE.getRentPrice());
+                    return price;}
+                case REGULAR: {if (getDays()<4){
+                    price=RentPriceClasses.BASIC_PRICE.getRentPrice();
+                }else{
+                    price= (RentPriceClasses.BASIC_PRICE.getRentPrice()).add(BigDecimal.valueOf(getDays()-3).multiply(RentPriceClasses.BASIC_PRICE.getRentPrice()), mc);
+                }
+                    return price;}
+                case OLD: { if (getDays()<6){
+                    price=RentPriceClasses.BASIC_PRICE.getRentPrice();
+                }else {
+                    price=(RentPriceClasses.BASIC_PRICE.getRentPrice()).add(BigDecimal.valueOf(getDays()-5).multiply(RentPriceClasses.BASIC_PRICE.getRentPrice()));
+                }
+                    return price;}
+                default: return defaultValue;
+            }
+        }
+
+
         public String print() {
             StringBuilder receipt = new StringBuilder();
             receipt.append(getMovieName())
@@ -161,8 +208,9 @@ public class PrintableOrderReceipt implements PrintableReceipt {
                     .append(") ")
                     .append(getDays());
 
-            // TODO: Print "day" in plural or single form
-            receipt.append(" day ");
+            if (getDays()<2){
+            receipt.append(" day ");}
+            else {receipt.append(" days ");}
 
             if (getPaidBonus() != null) {
                 receipt.append("(Paid with ").append(getPaidBonus()).append(" Bonus points) ");

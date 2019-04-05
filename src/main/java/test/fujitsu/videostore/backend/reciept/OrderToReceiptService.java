@@ -35,7 +35,7 @@ public class OrderToReceiptService {
             item.setDays(orderItem.getDays());
             item.setMovieName(orderItem.getMovie().getName());
             item.setMovieType(orderItem.getMovieType());
-
+           // PrintableOrderReceipt.Item.
             // TODO: Add calculated data
             //  RentOrder.Item::getMovieType,
             //  PrintableOrderReceipt.Item::getDays,
