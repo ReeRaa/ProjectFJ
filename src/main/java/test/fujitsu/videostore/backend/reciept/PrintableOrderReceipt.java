@@ -85,6 +85,7 @@ public class PrintableOrderReceipt implements PrintableReceipt {
            totalPrice = totalPrice.add(getOrderItems().get(i).getPaidMoney());
         }
         return totalPrice.subtract(BigDecimal.ONE);
+      //  return totalPrice.subtract(getTotalPrice());
     }
 
     public void setTotalPrice(BigDecimal totalPrice) {

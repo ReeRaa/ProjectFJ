@@ -1,12 +1,14 @@
 package test.fujitsu.videostore.backend.reciept;
 
 import test.fujitsu.videostore.backend.domain.MovieType;
+import test.fujitsu.videostore.backend.domain.RentOrder;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,6 +56,13 @@ public class PrintableReturnReceipt implements PrintableReceipt {
     }
 
     public BigDecimal getTotalCharge() {
+        //PrintableOrderReceipt printableOrderReceipt=new PrintableOrderReceipt();
+        Item item=new Item();
+        List <Integer> rentItemsList=new ArrayList(getReturnedItems());
+
+        for (int i=0;i< rentItemsList.size();i++){
+            totalCharge =totalCharge.add(getReturnedItems().get(i).getExtraPrice());
+        }
         return totalCharge;
     }
 
@@ -96,6 +105,7 @@ public class PrintableReturnReceipt implements PrintableReceipt {
         return receipt.toString();
     }
 
+    //TODO: look over, if this method is needed here!
     public int helpergetExtraDays() {
 
         int numberOfDaysReturnedLater;
@@ -134,30 +144,6 @@ public class PrintableReturnReceipt implements PrintableReceipt {
         public void setExtraDays(int extraDays) {
             this.extraDays = extraDays;
         }
-
-        //naidis
-/*        public BigDecimal getRentPriceCalculation(MovieType movieType){
-            MathContext mc=new MathContext(2);
-            switch (movieType){
-                case NEW: {price = BigDecimal.valueOf(getDays()).multiply(PrintableOrderReceipt.RentPriceClasses.PREMIUM_PRICE.getRentPrice());
-                    return price;}
-                case REGULAR: {if (getDays()<4){
-                    price= PrintableOrderReceipt.RentPriceClasses.BASIC_PRICE.getRentPrice();
-                }else{
-                    price= (PrintableOrderReceipt.RentPriceClasses.BASIC_PRICE.getRentPrice()).add(BigDecimal.valueOf(getDays()-3).multiply(PrintableOrderReceipt.RentPriceClasses.BASIC_PRICE.getRentPrice()), mc);
-                }
-                    return price;}
-                case OLD: { if (getDays()<6){
-                    price= PrintableOrderReceipt.RentPriceClasses.BASIC_PRICE.getRentPrice();
-                }else {
-                    price=(PrintableOrderReceipt.RentPriceClasses.BASIC_PRICE.getRentPrice()).add(BigDecimal.valueOf(getDays()-5).multiply(PrintableOrderReceipt.RentPriceClasses.BASIC_PRICE.getRentPrice()));
-                }
-                    return price;}
-                default: return defaultValue;
-            }
-        }*/
-
-        //naidis loppeb siin
 
         public BigDecimal getExtraPrice() {
             getMovieType();
