@@ -2,14 +2,19 @@ package test.fujitsu.videostore.backend.reciept;
 
 import test.fujitsu.videostore.backend.domain.MovieType;
 import test.fujitsu.videostore.backend.domain.RentOrder;
+import test.fujitsu.videostore.backend.domain.ReturnOrder;
 
 import java.math.BigDecimal;
 import java.math.MathContext;
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.Period;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.time.temporal.ChronoUnit.DAYS;
 
 /**
  * Return receipt printer
@@ -106,14 +111,7 @@ public class PrintableReturnReceipt implements PrintableReceipt {
     }
 
     //TODO: look over, if this method is needed here!
-    public int helpergetExtraDays() {
 
-        int numberOfDaysReturnedLater;
-        Period period=Period.between(getRentDate(),getReturnDate());
-        numberOfDaysReturnedLater=period.getDays() ;
-
-        return numberOfDaysReturnedLater;
-    }
 
     public static class Item implements PrintableReceipt {
         private String movieName;
@@ -137,7 +135,13 @@ public class PrintableReturnReceipt implements PrintableReceipt {
             this.movieType = movieType;
         }
 
+        RentOrder or=new RentOrder();
+        PrintableReturnReceipt pr=new PrintableReturnReceipt();
+
         public int getExtraDays() {
+           // long valueD = ChronoUnit.DAYS.between(or.getOrderDate(),pr.getReturnDate()) ;
+           // extraDays=(int)valueD;
+
             return extraDays;
         }
 

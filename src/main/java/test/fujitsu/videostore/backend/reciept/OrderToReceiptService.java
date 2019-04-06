@@ -5,6 +5,7 @@ import test.fujitsu.videostore.backend.domain.ReturnOrder;
 
 import java.math.BigDecimal;
 import java.time.Period;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -84,10 +85,15 @@ public class OrderToReceiptService {
                 item.setMovieType(rentedItem.getMovieType());
                 // TODO: DONE Set calculated data how much later rented movie was returned <-calculated!
 
-                Period period=Period.between(receipt.getRentDate(),receipt.getReturnDate());
-                numberOfDaysReturnedLater=period.getDays() ;
+                //Period period=Period.between(receipt.getRentDate(),receipt.getReturnDate());
+                //numberOfDaysReturnedLater=period.getDays() ;
 
-                item.setExtraDays(numberOfDaysReturnedLater);
+//                item.setExtraDays(numberOfDaysReturnedLater);
+//                item.setExtraDays((int)((order.getRentOrder().getOrderDate()).until(rentedItem.getReturnedDay(), ChronoUnit.DAYS))) ;
+                item.setExtraDays((int)ChronoUnit.DAYS.between(receipt.getRentDate(),receipt.getReturnDate()));
+                //               item.setExtraDays(item.getExtraDays()) ;
+
+               // ifPresent(movieToReturn -> movieToReturn.setReturnedDay(returnOrder.getReturnDate
 
                 // TODO: DONE Set calculated data how much it will cost extra days
                 item.setExtraPrice(BigDecimal.ZERO);
