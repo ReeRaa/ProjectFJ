@@ -4,6 +4,7 @@ import test.fujitsu.videostore.backend.domain.MovieType;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 /**
@@ -66,16 +67,23 @@ public class PrintableReturnReceipt implements PrintableReceipt {
         this.returnedItems = returnedItems;
     }
 
+    String formattedRentDate;
+    String formattedReturnDate;
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd-MM-YY");
+
     @Override
     public String print() {
+        formattedRentDate=getRentDate().format(formatter);
+        formattedReturnDate=getReturnDate().format(formatter);
+
         StringBuilder receipt = new StringBuilder()
                 .append("ID: ").append(getOrderId()).append(" (Return)")
                 .append("\n")
-                // TODO: Format rent date in dd-MM-YY format
-                .append("Rent date: ").append(getRentDate().toString())
+                // Done: Format rent date in dd-MM-YY format
+                .append("Rent date: ").append(formattedRentDate)
                 .append("\n").append("Customer: ").append(getCustomerName())
-                // TODO: Format return date in dd-MM-YY format
-                .append("\nReturn date: ").append(getReturnDate().toString())
+                // Done: Format return date in dd-MM-YY format
+                .append("\nReturn date: ").append(formattedReturnDate)
                 .append("\n");
 
         returnedItems.forEach(item -> receipt.append(item.print()));

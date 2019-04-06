@@ -63,9 +63,6 @@ public class VideoStoreInventoryLogic {
         return movieDBTableRepository.findById(movieId);
     }
 
-/*    public void writeMovieBackToFile(Movie object){
-        Movie writeBackMovie = movieDBTableRepository.writeMovieBackToFile(movie);
-    }*/
 
     public void saveMovie(Movie movie) {
         boolean isNew = movie.isNewObject();

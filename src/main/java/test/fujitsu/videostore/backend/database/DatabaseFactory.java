@@ -72,7 +72,8 @@ public class DatabaseFactory {
                                 mainMap.put("id", movieList.get(i).getId());
                                 mainMap.put("name", movieList.get(i).getName());
                                 mainMap.put("stockCount", movieList.get(i).getStockCount());
-                                mainMap.put("type", movieList.get(i).getType().getDatabaseId());
+                               // mainMap.put("type", movieList.get(i).getType().getDatabaseId());
+                                mainMap.put("type", movieList.get(i).getType());
                                 if (movieList.get(i).getId() != object.getId()) {
                                     movieArray.add(mainMap);
                                     jo.put("movie", movieArray);
@@ -305,6 +306,20 @@ public class DatabaseFactory {
                         Number MovieStockCount = (Number) movieData.get("stockCount");
                         movie.setStockCount(MovieStockCount.intValue());
 
+                        Number aMovieType = (Number)movieData.get("type");
+
+                        switch (aMovieType.intValue()){
+                            case 1:
+                                MovieType mt1= MovieType.NEW;
+                                movie.setType(mt1); break;
+                            case 2:
+                                MovieType mt2= MovieType.REGULAR;
+                                movie.setType(mt2);break;
+                            case 3:
+                                MovieType mt3= MovieType.OLD;
+                                movie.setType(mt3);break;
+                        }
+
                         movieList.add(movie);
                     }
 
@@ -396,13 +411,13 @@ public class DatabaseFactory {
                             switch (aMovieType.intValue()) {
                                 case 1:
                                     MovieType mt1 = MovieType.NEW;
-                                    item.setMovieType(mt1);
+                                    item.setMovieType(mt1); break;
                                 case 2:
                                     MovieType mt2 = MovieType.REGULAR;
-                                    item.setMovieType(mt2);
+                                    item.setMovieType(mt2); break;
                                 case 3:
                                     MovieType mt3 = MovieType.OLD;
-                                    item.setMovieType(mt3);
+                                    item.setMovieType(mt3);break;
                             }
                             Number days = (Number) itemData.get("days");
                             item.setDays(days.intValue());
@@ -642,13 +657,13 @@ public class DatabaseFactory {
                             switch (aMovieType.intValue()) {
                                 case 1:
                                     MovieType mt1 = MovieType.NEW;
-                                    item.setMovieType(mt1);
+                                    item.setMovieType(mt1); break;
                                 case 2:
                                     MovieType mt2 = MovieType.REGULAR;
-                                    item.setMovieType(mt2);
+                                    item.setMovieType(mt2);break;
                                 case 3:
                                     MovieType mt3 = MovieType.OLD;
-                                    item.setMovieType(mt3);
+                                    item.setMovieType(mt3);break;
                             }
                             Number days = (Number) itemData.get("days");
                             item.setDays(days.intValue());
@@ -867,7 +882,7 @@ public class DatabaseFactory {
                                     itemsObject = new JSONObject();
 
                                     itemsObject.put("movie", orderList.get(i).getItems().get(j).getMovie().getId());
-                                    itemsObject.put("type", orderList.get(i).getItems().get(j).getMovieType().getDatabaseId());
+                                   itemsObject.put("type", orderList.get(i).getItems().get(j).getMovieType().getDatabaseId());
                                     itemsObject.put("paidByBonus", orderList.get(i).getItems().get(j).isPaidByBonus());
                                     itemsObject.put("days", orderList.get(i).getItems().get(j).getDays());
 

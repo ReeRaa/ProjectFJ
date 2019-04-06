@@ -44,6 +44,7 @@ public class OrderToReceiptService {
                 item.setPaidBonus(1);
             } else {
                 item.setPaidMoney(BigDecimal.ONE);
+               // item.setPaidMoney(PrintableOrderReceipt);
             }
 
             itemList.add(item);
