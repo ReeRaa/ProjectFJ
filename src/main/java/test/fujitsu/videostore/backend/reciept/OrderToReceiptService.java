@@ -4,6 +4,7 @@ import test.fujitsu.videostore.backend.domain.RentOrder;
 import test.fujitsu.videostore.backend.domain.ReturnOrder;
 
 import java.math.BigDecimal;
+import java.time.Period;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -65,8 +66,10 @@ public class OrderToReceiptService {
      * @param order return object
      * @return Printable receipt object
      */
+
     public PrintableReturnReceipt convertRentOrderToReceipt(ReturnOrder order) {
         PrintableReturnReceipt receipt = new PrintableReturnReceipt();
+        int numberOfDaysReturnedLater;
 
         receipt.setOrderId(Integer.toString(order.getRentOrder().getId()));
         receipt.setCustomerName(order.getRentOrder().getCustomer().getName());
@@ -79,8 +82,13 @@ public class OrderToReceiptService {
                 PrintableReturnReceipt.Item item = new PrintableReturnReceipt.Item();
                 item.setMovieName(rentedItem.getMovie().getName());
                 item.setMovieType(rentedItem.getMovieType());
-                // TODO: Set calculated data how much later rented movie was returned
-                item.setExtraDays(0);
+                // TODO: DONE Set calculated data how much later rented movie was returned <-calculated!
+
+                Period period=Period.between(receipt.getRentDate(),receipt.getReturnDate());
+                numberOfDaysReturnedLater=period.getDays() ;
+
+                item.setExtraDays(numberOfDaysReturnedLater);
+
                 // TODO: Set calculated data how much it will cost extra days
                 item.setExtraPrice(BigDecimal.ZERO);
 

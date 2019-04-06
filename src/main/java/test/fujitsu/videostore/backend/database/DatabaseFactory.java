@@ -31,7 +31,6 @@ public class DatabaseFactory {
      * Two example files, /db-examples/database.json and /db-examples/database.yaml.
      * Hint: MovieType.databaseId == type field in database files.
      *
-     * TODO: Current way of creating next ID is incorrect, make better implementation.
      *
      * @param filePath file path to database
      * @return database proxy for different tables
@@ -915,11 +914,8 @@ public class DatabaseFactory {
                                 if (object.getId() != orderList.get(i).getId()) {
                                     mainArray.add(orderObject);
                                 }
-                                // jo.put("order", ordersArray); }
                             }}
-                           // ordersArray.add(objectArray);
-                           // ordersArray.add(mainArray);
-//siin loppeb muudetav kood
+
                             return mainArray;
                         }
 
