@@ -89,8 +89,9 @@ public class OrderToReceiptService {
 
                 item.setExtraDays(numberOfDaysReturnedLater);
 
-                // TODO: Set calculated data how much it will cost extra days
-                item.setExtraPrice(BigDecimal.ZERO);
+                // TODO: DONE Set calculated data how much it will cost extra days
+             //   item.setExtraPrice(BigDecimal.ZERO);
+                item.setExtraPrice(receipt.getTotalCharge());
 
                 returnedItems.add(item);
             }
