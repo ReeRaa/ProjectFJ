@@ -72,8 +72,7 @@ public class DatabaseFactory {
                                 mainMap.put("id", movieList.get(i).getId());
                                 mainMap.put("name", movieList.get(i).getName());
                                 mainMap.put("stockCount", movieList.get(i).getStockCount());
-                               // mainMap.put("type", movieList.get(i).getType().getDatabaseId());
-                                mainMap.put("type", movieList.get(i).getType());
+                                mainMap.put("type", movieList.get(i).getType().getDatabaseId());
                                 if (movieList.get(i).getId() != object.getId()) {
                                     movieArray.add(mainMap);
                                     jo.put("movie", movieArray);
