@@ -21,14 +21,13 @@ import org.json.simple.parser.ParseException;
 /**
  * Database Factory.
  * <p>
- * TODO: Should be re-implemented with your file database. Current implementation is just demo for UI testing.
  */
 public class DatabaseFactory {
 
     /**
      * Creates database "connection"/opens database from path.
      * <p>
-     * TODO: Implement database parsing, fetching, creation, modification, removing from JSON or YAML file database.
+     * TODO: Implement database parsing, fetching, creation, modification, removing from YAML file database.
      * Two example files, /db-examples/database.json and /db-examples/database.yaml.
      * Hint: MovieType.databaseId == type field in database files.
      *
@@ -176,10 +175,17 @@ public class DatabaseFactory {
 
                     @Override
                     public int generateNextId() {
-                        return movieList.size() + 1; //add static variable
+                        List<Integer> indexList=new ArrayList();
+                        int maxIndex;
+                        for (int i=0;i<movieList.size();i++){
+                            indexList.add(getMoviesList().get(i).getId());
+                        }
+                        maxIndex = Collections.max(indexList) +1;
+                        return maxIndex; //add static variable
                     }
                 };
             }
+
 
             //method to write Customer into Array
             public JSONArray createCustomersArrayForWritingBack(){
@@ -332,7 +338,7 @@ public class DatabaseFactory {
                 return movieList;
             }
 
-            //ADDED NEW METHOD to get customer list
+            //get customer list
             public List<Customer> getCustomerList() {
 
                 final List<Customer> customerList = new ArrayList<>();
@@ -514,7 +520,6 @@ public class DatabaseFactory {
 
                             }
 
-                            //PrintWriter pwr = new PrintWriter(filePath);
                            // PrintWriter pwr = new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\RemoveCustomer.json");
                             PrintWriter pwr = new PrintWriter(filePath);
                             pwr.write(jo.toJSONString());
@@ -609,11 +614,17 @@ public class DatabaseFactory {
 
                     @Override
                     public int generateNextId() {
-                        return customerList.size() + 1;
+                        List<Integer> cusomerIndexList=new ArrayList<>();
+                        int maxIndex;
+                        for (int i=0;i<customerList.size();i++){
+                            cusomerIndexList.add(getCustomerList().get(i).getId());
+                        }
+                        maxIndex=Collections.max(cusomerIndexList)+1;
+
+                        return maxIndex;
                     }
                 };
             }
-            //TODO: for next Order
 
             @Override
             public DBTableRepository<RentOrder> getOrderTable() {
@@ -789,7 +800,6 @@ public class DatabaseFactory {
                         return orderList.remove(object);
                     }
 
-//TODO next: update /add order
                     //method to write movies into Array
                     public JSONArray createRentOrderArrayForWritingBackInsideOrder(RentOrder object) {
                      //   RentOrder order = findById((object.getId()));
@@ -966,7 +976,14 @@ public class DatabaseFactory {
 
                     @Override
                     public int generateNextId() {
-                        return orderList.size() + 1;
+                        List<Integer> orderIndexList=new ArrayList<>();
+                        int maxIndex;
+                        for (int i=0;i<orderList.size();i++){
+                            orderIndexList.add(getRentOrderList().get(i).getId());
+                        }
+                        maxIndex=Collections.max(orderIndexList)+1;
+
+                        return maxIndex;
                     }
                 };
             }
