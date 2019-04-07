@@ -184,7 +184,6 @@ public class DatabaseFactory {
                 };
             }
 
-
             //method to write Customer into Array
             public JSONArray createCustomersArrayForWritingBack(){
                 JSONArray customerArray = new JSONArray();
@@ -204,10 +203,7 @@ public class DatabaseFactory {
             //method to write movies into Array
             public JSONArray createMovieArrayforWritingBack() {
                 Map mainMap;
-               // JSONObject jo = new JSONObject();
-               // JSONObject joW = new JSONObject();
                 JSONArray movieArray = new JSONArray();
-               // mainMap = new LinkedHashMap(4);
 
                 for (int i = 0; i < getMoviesList().size(); i++) {
                     mainMap = new LinkedHashMap(4);
@@ -227,8 +223,6 @@ public class DatabaseFactory {
 
                 JSONArray ordersArray = new JSONArray();
                 JSONArray itemsArray;
-
-               // List orderList=new LinkedList(getRentOrderList());
 
                 int year;
                 int month;
@@ -361,7 +355,6 @@ public class DatabaseFactory {
 
                         customerList.add(customer);
                     }
-
 
                 } catch (FileNotFoundException e) {
                     e.printStackTrace();
@@ -519,8 +512,6 @@ public class DatabaseFactory {
                                 }
 
                             }
-
-                           // PrintWriter pwr = new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\RemoveCustomer.json");
                             PrintWriter pwr = new PrintWriter(filePath);
                             pwr.write(jo.toJSONString());
                             pwr.flush();
@@ -533,7 +524,6 @@ public class DatabaseFactory {
                         }
                         return customerList.remove(object);
                     }
-
 
                     //method to write movies into Array
                     public JSONArray createCustomerArrayforWritingBackInsideCustomer(Customer object) {
@@ -568,17 +558,13 @@ public class DatabaseFactory {
                         Customer customer=findById((object.getId()));
 
                         try {
-                            Map mainMap;
                             JSONObject jo=new JSONObject();
-                            JSONArray customerArray=new JSONArray();
-                            mainMap = new LinkedHashMap(4);
 
                             jo.put("movie", createMovieArrayforWritingBack());
                             jo.put("customer",createCustomerArrayforWritingBackInsideCustomer(object));
                             jo.put("order", createOrdersArrayForWritingBack());
 
                             //printer part
-                            // PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\createOrUpdateMovie.json");
                           PrintWriter pwr=new PrintWriter(filePath);
                             pwr.write(jo.toJSONString());
                             pwr.flush();
@@ -784,7 +770,6 @@ public class DatabaseFactory {
                             }
 
 
-                            //  PrintWriter pwr = new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\RemoveOrders.json");
                            PrintWriter pwr = new PrintWriter(filePath);
                             pwr.write(jo.toJSONString());
 
@@ -803,21 +788,12 @@ public class DatabaseFactory {
 
                     //method to write movies into Array
                     public JSONArray createRentOrderArrayForWritingBackInsideOrder(RentOrder object) {
-                     //   RentOrder order = findById((object.getId()));
 
-                      //  Map mainMap;
-                        // mainMap = new LinkedHashMap(4);
-
-                        // JSONObject jo = new JSONObject();
-                       // JSONObject joW = new JSONObject();
-                       // JSONArray ordersArray = new JSONArray();
-                        JSONArray objectArray = new JSONArray();
                         JSONArray mainArray = new JSONArray();
                         JSONArray itemsArray = new JSONArray();
 
                         JSONObject orderObject = new JSONObject();
                         JSONObject itemsObject;
-                        JSONObject mainObject;
 
                         int year;
                         int month;
@@ -838,9 +814,6 @@ public class DatabaseFactory {
                             orderDate = LocalDate.of(year, month, day);
                             formattedDate = formatter.format(orderDate);
                         orderObject.put("orderDate", formattedDate);
-                        //ordersArray.add(orderObject);
-
-                        //objectArray.add(mainMap);
 
                         for (int j = 0; j < object.getItems().size(); j++) {
                             itemsObject = new JSONObject();
@@ -886,7 +859,6 @@ public class DatabaseFactory {
                                     orderDate = LocalDate.of(year, month, day);
                                     formattedDate = formatter.format(orderDate);
                                 orderObject.put("orderDate", formattedDate);
-                                //mainArray.add(orderObject);
 
                                 for (int j = 0; j < orderList.get(i).getItems().size(); j++) {
                                     itemsObject = new JSONObject();
@@ -938,7 +910,6 @@ public class DatabaseFactory {
                             jo.put("order", createRentOrderArrayForWritingBackInsideOrder(object));
 
                             //printer part
-                           // PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\createOrUpdateRentOrder.json");
                             PrintWriter pwr=new PrintWriter(filePath);
                             pwr.write(jo.toJSONString());
                             pwr.flush();
