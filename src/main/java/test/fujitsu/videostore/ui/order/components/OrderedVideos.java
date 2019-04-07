@@ -107,6 +107,7 @@ public class OrderedVideos extends VerticalLayout implements HasValue<AbstractFi
             checkboxPaidWithBonus.setValue(item.isPaidByBonus());
             checkboxPaidWithBonus.addValueChangeListener(event -> item.setPaidByBonus(event.getValue()));
 
+
             if (isReadOnly() || !item.getMovieType().equals(MovieType.NEW)) {
                 checkboxPaidWithBonus.setReadOnly(true);
             }

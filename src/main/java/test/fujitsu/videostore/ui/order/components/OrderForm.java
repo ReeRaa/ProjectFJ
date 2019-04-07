@@ -32,6 +32,16 @@ public class OrderForm extends Div {
     private Binder<RentOrder> binder;
     private RentOrder currentOrder;
 
+    public boolean hasEnoughPoints(){//lisasin alates siit
+        int points= currentOrder.getCustomer().getPoints();
+        int days= points/25;
+
+        if (points >=25){return true;}
+        else return false;
+    }
+
+
+
     public OrderForm(OrderListLogic orderListLogic) {
         setId("edit-form");
         setSizeFull();
@@ -87,7 +97,15 @@ public class OrderForm extends Div {
             }
 
             // TODO: Validate that user have enough bonus points
+           /* //public boolean hasEnoughPoints(){//lisasin alates siit
+                int points= currentOrder.getCustomer().getPoints();
+                int days= points/25;
+
+                if (points >=25){return true;}
+                else return false;
+          //  }*/
             binder.writeBeanIfValid(currentOrder);
+            //binder.has(currentOrder);
             new ReceiptWindow(viewLogic.getOrderToReceiptService().convertRentOrderToReceipt(currentOrder).print(), currentOrder.isNewObject(), () -> viewLogic.saveOrder(currentOrder));
         });
 

@@ -70,7 +70,7 @@ public class OrderToReceiptService {
 
     public PrintableReturnReceipt convertRentOrderToReceipt(ReturnOrder order) {
         PrintableReturnReceipt receipt = new PrintableReturnReceipt();
-        int numberOfDaysReturnedLater;
+        PrintableOrderReceipt.Item orderReceipt=new PrintableOrderReceipt.Item();
 
         receipt.setOrderId(Integer.toString(order.getRentOrder().getId()));
         receipt.setCustomerName(order.getRentOrder().getCustomer().getName());
@@ -90,7 +90,7 @@ public class OrderToReceiptService {
 
 //                item.setExtraDays(numberOfDaysReturnedLater);
 //                item.setExtraDays((int)((order.getRentOrder().getOrderDate()).until(rentedItem.getReturnedDay(), ChronoUnit.DAYS))) ;
-                item.setExtraDays((int)ChronoUnit.DAYS.between(receipt.getRentDate(),receipt.getReturnDate()));
+                item.setExtraDays((int)ChronoUnit.DAYS.between(receipt.getRentDate(),receipt.getReturnDate())- orderReceipt.getDays());
                 //               item.setExtraDays(item.getExtraDays()) ;
 
                // ifPresent(movieToReturn -> movieToReturn.setReturnedDay(returnOrder.getReturnDate

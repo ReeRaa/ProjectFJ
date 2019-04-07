@@ -76,16 +76,11 @@ public class PrintableOrderReceipt implements PrintableReceipt {
 
 
     public BigDecimal getTotalPrice() {
-        totalPrice=calcTotalPrice();
-        return totalPrice;
-    }
 
-    public BigDecimal calcTotalPrice(){
         for (int i=0;i<getOrderItems().size();i++){
-           totalPrice = totalPrice.add(getOrderItems().get(i).getPaidMoney());
+            totalPrice = totalPrice.add(getOrderItems().get(i).getPaidMoney());
         }
         return totalPrice.subtract(BigDecimal.ONE);
-      //  return totalPrice.subtract(getTotalPrice());
     }
 
     public void setTotalPrice(BigDecimal totalPrice) {
@@ -110,7 +105,7 @@ public class PrintableOrderReceipt implements PrintableReceipt {
         StringBuilder receipt = new StringBuilder()
                 .append("ID: ").append(getOrderId())
                 .append("\n")
-                // Done Format rent date in dd-MM-YY format
+                //Format rent date in dd-MM-YY format
                 .append("Date: ").append(formattedDate)
                 .append("\n").append("Customer: ").append(getCustomerName())
                 .append("\n");
@@ -178,6 +173,8 @@ public class PrintableOrderReceipt implements PrintableReceipt {
         }
 
         public Integer getPaidBonus() {
+
+
             return paidBonus;
         }
 
