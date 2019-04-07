@@ -1,5 +1,6 @@
 package test.fujitsu.videostore.backend.reciept;
 
+import test.fujitsu.videostore.backend.domain.Customer;
 import test.fujitsu.videostore.backend.domain.RentOrder;
 import test.fujitsu.videostore.backend.domain.ReturnOrder;
 
@@ -22,6 +23,8 @@ public class OrderToReceiptService {
      * @param order rent object
      * @return Printable receipt object
      */
+
+
     public PrintableOrderReceipt convertRentOrderToReceipt(RentOrder order) {
         PrintableOrderReceipt printableOrderReceipt = new PrintableOrderReceipt();
 
@@ -29,11 +32,32 @@ public class OrderToReceiptService {
         printableOrderReceipt.setOrderDate(order.getOrderDate());
         printableOrderReceipt.setCustomerName(order.getCustomer().getName());
 
+        int customerPoints= order.getCustomer().getPoints();
+        int customerId = order.getCustomer().getId();
+        int isItEnough=0;
+        int remainingDaystoBePaid;
+        int remainingPoints=0;
+        int usedPoints=0;
+
+
         List<PrintableOrderReceipt.Item> itemList = new ArrayList<>();
         printableOrderReceipt.setOrderItems(itemList);
 
         for (RentOrder.Item orderItem : order.getItems()) {
             PrintableOrderReceipt.Item item = new PrintableOrderReceipt.Item();
+            if (orderItem.isPaidByBonus()){
+                isItEnough= customerPoints/25;
+                if (isItEnough<=orderItem.getDays()){
+                    remainingDaystoBePaid=orderItem.getDays() - isItEnough;
+                    usedPoints=order.getCustomer().getPoints()- (isItEnough * 25);
+                    remainingPoints=customerPoints - usedPoints;
+
+                } else{
+                    usedPoints=order.getCustomer().getPoints()- (orderItem.getDays() * 25);
+                    remainingPoints=customerPoints - usedPoints;
+
+                }
+            }
             item.setDays(orderItem.getDays());
             item.setMovieName(orderItem.getMovie().getName());
             item.setMovieType(orderItem.getMovieType());
@@ -43,10 +67,9 @@ public class OrderToReceiptService {
             //  PrintableOrderReceipt.Item::getDays,
             //  PrintableOrderReceipt.Item::getDays::isPaidByBonus
             if (orderItem.isPaidByBonus()) {
-                item.setPaidBonus(1);
+                item.setPaidBonus(isItEnough*25); //how much was paid with bonusPoints
             } else {
                 item.setPaidMoney(BigDecimal.ONE);
-               // item.setPaidMoney(PrintableOrderReceipt);
             }
 
             itemList.add(item);
@@ -56,7 +79,9 @@ public class OrderToReceiptService {
         printableOrderReceipt.setTotalPrice(BigDecimal.ONE);
 
         // TODO: Set how many bonus points remaining for customer
-        printableOrderReceipt.setRemainingBonusPoints(0);
+        printableOrderReceipt.setRemainingBonusPoints(remainingPoints);
+
+        order.getCustomer().setPoints(remainingPoints);
 
         return printableOrderReceipt;
     }
@@ -85,7 +110,6 @@ public class OrderToReceiptService {
                 item.setMovieType(rentedItem.getMovieType());
                 // TODO: DONE Set calculated data how much later rented movie was returned <-calculated!
 
-                //Period period=Period.between(receipt.getRentDate(),receipt.getReturnDate());
                 //numberOfDaysReturnedLater=period.getDays() ;
 
 //                item.setExtraDays(numberOfDaysReturnedLater);

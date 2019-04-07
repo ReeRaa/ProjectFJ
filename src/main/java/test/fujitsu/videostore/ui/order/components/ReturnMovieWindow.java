@@ -10,6 +10,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.dom.Element;
 import com.vaadin.flow.dom.ElementFactory;
 import test.fujitsu.videostore.backend.database.DBTableRepository;
+import test.fujitsu.videostore.backend.domain.Customer;
 import test.fujitsu.videostore.backend.domain.RentOrder;
 import test.fujitsu.videostore.backend.domain.ReturnOrder;
 import test.fujitsu.videostore.backend.reciept.OrderToReceiptService;
@@ -95,6 +96,7 @@ public class ReturnMovieWindow extends Dialog {
         Button cancel = new Button("Cancel");
         cancel.setId("cancel-return");
         cancel.addClickListener(event -> close());
+
 
         Button save = new Button("Approve and Save");
         save.setId("return-movies");

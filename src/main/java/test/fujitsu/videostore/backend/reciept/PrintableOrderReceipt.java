@@ -1,5 +1,7 @@
 package test.fujitsu.videostore.backend.reciept;
 
+import org.junit.jupiter.api.Order;
+import test.fujitsu.videostore.backend.domain.Customer;
 import test.fujitsu.videostore.backend.domain.MovieType;
 import test.fujitsu.videostore.backend.domain.RentOrder;
 
@@ -129,6 +131,7 @@ public class PrintableOrderReceipt implements PrintableReceipt {
 
         return receipt.toString();
     }
+    OrderToReceiptService os=new OrderToReceiptService();
 
 
     public static class Item {
@@ -163,9 +166,26 @@ public class PrintableOrderReceipt implements PrintableReceipt {
             this.days = days;
         }
 
+        int daysPaidWithBonus;
+        int daystToBePayed;
+
+        public int usedPoints() {
+            int usedPoints=getPaidBonus();
+            return usedPoints();
+        }
+
+
         public BigDecimal getPaidMoney() {
-            paidMoney= getRentPriceCalculation(getMovieType());
-            return paidMoney;
+            if (getPaidBonus() != null){
+                daysPaidWithBonus =getPaidBonus()/25;
+                daystToBePayed= getDays()- daysPaidWithBonus;
+                setDays(daystToBePayed);
+                paidMoney =getRentPriceCalculation(getMovieType());
+                return paidMoney;
+            }else {
+                paidMoney = getRentPriceCalculation(getMovieType());
+                return paidMoney;
+            }
         }
 
         public void setPaidMoney(BigDecimal paidMoney) {
@@ -173,8 +193,6 @@ public class PrintableOrderReceipt implements PrintableReceipt {
         }
 
         public Integer getPaidBonus() {
-
-
             return paidBonus;
         }
 
@@ -219,7 +237,7 @@ public class PrintableOrderReceipt implements PrintableReceipt {
             else {receipt.append(" days ");}
 
             if (getPaidBonus() != null) {
-                receipt.append("(Paid with ").append(getPaidBonus()).append(" Bonus points) ");
+                receipt.append("(Partly paid with ").append(getPaidBonus()).append(" Bonus points) ");
             } else {
                 receipt.append(getPaidMoney()).append(" EUR");
             }

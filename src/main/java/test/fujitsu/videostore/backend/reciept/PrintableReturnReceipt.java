@@ -139,9 +139,6 @@ public class PrintableReturnReceipt implements PrintableReceipt {
         PrintableReturnReceipt pr=new PrintableReturnReceipt();
 
         public int getExtraDays() {
-           // long valueD = ChronoUnit.DAYS.between(or.getOrderDate(),pr.getReturnDate()) ;
-           // extraDays=(int)valueD;
-
             return extraDays;
         }
 
