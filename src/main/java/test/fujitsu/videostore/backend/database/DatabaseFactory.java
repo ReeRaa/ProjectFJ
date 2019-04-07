@@ -139,7 +139,6 @@ public class DatabaseFactory {
                             jo.put("order", createOrdersArrayForWritingBack());
 
                             //printer part
-                           // PrintWriter pwr=new PrintWriter("C:\\Users\\reelyka.laheb\\Desktop\\Java\\createOrUpdateMovie.json");
                             PrintWriter pwr=new PrintWriter(filePath);
                             pwr.write(jo.toJSONString());
                             pwr.flush();
@@ -180,7 +179,7 @@ public class DatabaseFactory {
                             indexList.add(getMoviesList().get(i).getId());
                         }
                         maxIndex = Collections.max(indexList) +1;
-                        return maxIndex; //add static variable
+                        return maxIndex;
                     }
                 };
             }
@@ -205,10 +204,10 @@ public class DatabaseFactory {
             //method to write movies into Array
             public JSONArray createMovieArrayforWritingBack() {
                 Map mainMap;
-                JSONObject jo = new JSONObject();
-                JSONObject joW = new JSONObject();
+               // JSONObject jo = new JSONObject();
+               // JSONObject joW = new JSONObject();
                 JSONArray movieArray = new JSONArray();
-                mainMap = new LinkedHashMap(4);
+               // mainMap = new LinkedHashMap(4);
 
                 for (int i = 0; i < getMoviesList().size(); i++) {
                     mainMap = new LinkedHashMap(4);
@@ -223,13 +222,13 @@ public class DatabaseFactory {
 
             //method to write rentOrders into Array
             public JSONArray createOrdersArrayForWritingBack(){
-                JSONObject orderObject = new JSONObject();
-                JSONObject itemsObject = new JSONObject();
+                JSONObject orderObject;
+                JSONObject itemsObject;
 
                 JSONArray ordersArray = new JSONArray();
-                JSONArray itemsArray = new JSONArray();
+                JSONArray itemsArray;
 
-                List orderList=new LinkedList(getRentOrderList());
+               // List orderList=new LinkedList(getRentOrderList());
 
                 int year;
                 int month;
@@ -484,6 +483,8 @@ public class DatabaseFactory {
                 }
 
                 return new DBTableRepository<Customer>() {
+
+
                     @Override
                     public List<Customer> getAll() {
                         return customerList;
@@ -616,7 +617,8 @@ public class DatabaseFactory {
                         List<Integer> cusomerIndexList=new ArrayList<>();
                         int maxIndex;
                         for (int i=0;i<customerList.size();i++){
-                            cusomerIndexList.add(getCustomerList().get(i).getId());
+                            //cusomerIndexList.add(getCustomerList().get(i).getId());
+                            cusomerIndexList.add(getAll().get(i).getId());
                         }
                         maxIndex=Collections.max(cusomerIndexList)+1;
 

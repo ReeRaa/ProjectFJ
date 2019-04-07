@@ -97,7 +97,7 @@ public class OrderForm extends Div {
             }
 
             // TODO: Validate that user have enough bonus points
-           /* //public boolean hasEnoughPoints(){//lisasin alates siit
+           /* //public boolean hasEnoughPoints(){
                 int points= currentOrder.getCustomer().getPoints();
                 int days= points/25;
 
