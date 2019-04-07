@@ -67,9 +67,6 @@ public class DatabaseSelectionView extends FlexLayout {
         return verticalLayout;
     }
 
-   // public final class JSONUtils {
-      //  private JSONUtils(){}
-
         public boolean isJSONValid(String jsonInString ) {
             try {
                 final ObjectMapper mapper = new ObjectMapper();
@@ -94,30 +91,24 @@ public class DatabaseSelectionView extends FlexLayout {
         return content;
     }
 
-
     private void selectDatabase() {
         selectDatabaseButton.setEnabled(false);
         try {
-            // TODO: Make validations against selected database. If there will be an error, then show notification with
-            // using https://vaadin.com/api/platform/com/vaadin/flow/component/notification/Notification.html
+            // Validations against selected database.
+            //validates if file is valid json file and if there is a json file on given path
             String path= databasePath.getValue();
             String fileType= path.substring(path.length() - 5);
 
-            if (!isJSONValid(databasePath.getValue())){
-                Notification firstError= Notification.show("Please give valid json file!");
+            if (!fileType.equals(".json")) {
+                Notification firstError = Notification.show("Please give valid database file path!");
             }else {
+                if (!isJSONValid(databasePath.getValue())){
+                    Notification secondError= Notification.show("Please give valid json file!");
 
-                if (fileType.equals(".json")) {
-                    CurrentDatabase.set(databasePath.getValue());
                 } else {
-                    Notification secondError = Notification.show("Please give valid database file path!");
-
+                    CurrentDatabase.set(databasePath.getValue());
                 }
             }
-
-
-
-
 
             getUI().get().navigate("");
         } finally {
